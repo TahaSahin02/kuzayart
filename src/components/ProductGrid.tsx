@@ -224,9 +224,6 @@ export default function ProductGrid() {
               Koleksiyon
             </h2>
           </div>
-          <p className="text-sm text-white/35 max-w-xs leading-relaxed">
-            Her eser özgün bir yağlıboya tablo olup sanatçı imzalı sertifikasıyla birlikte teslim edilir.
-          </p>
         </div>
 
         {/* Grid — 2 per row */}

@@ -68,7 +68,8 @@ export default function HeroCarousel() {
   return (
     <section
       id="hero"
-      className="relative w-full h-screen overflow-hidden"
+      className="relative w-full overflow-hidden"
+      style={{ height: "100svh" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -91,14 +92,15 @@ export default function HeroCarousel() {
             priority={i === 0}
             quality={100}
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-contain md:object-cover object-center"
+            style={{ objectPosition: "center 40%" }}
           />
           {/* Gradient overlay */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.2) 50%, rgba(10,10,10,0.15) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.1) 40%, rgba(10,10,10,0.1) 100%)",
             }}
           />
         </div>
