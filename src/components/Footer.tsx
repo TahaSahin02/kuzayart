@@ -66,20 +66,20 @@ export default function Footer() {
             </p>
             <ul className="flex flex-col gap-3">
               {[
-                "Kullanım Şartları",
-                "Gizlilik Politikası",
-                "Mesafeli Satış",
-                "İptal & İade",
-                "Tüketici Hakları",
-                "Ödeme & Teslimat",
+                { label: "Kullanım Şartları", href: "/yasal/kullanim-sartlari" },
+                { label: "Gizlilik Politikası", href: "/yasal/gizlilik-politikasi" },
+                { label: "Mesafeli Satış", href: "/yasal/mesafeli-satis" },
+                { label: "İptal & İade", href: "/yasal/iptal-iade" },
+                { label: "Tüketici Hakları", href: "/yasal/tuketici-haklari" },
+                { label: "Ödeme & Teslimat", href: "/yasal/odeme-teslimat" },
               ].map((item) => (
-                <li key={item}>
-                  <a href="#" className="text-sm transition-colors duration-200" style={{ color: "rgba(255,255,255,0.45)" }}
+                <li key={item.href}>
+                  <Link href={item.href} className="text-sm transition-colors duration-200" style={{ color: "rgba(255,255,255,0.45)" }}
                     onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
                     onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
                   >
-                    {item}
-                  </a>
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
