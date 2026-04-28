@@ -153,7 +153,6 @@ function ProductCard({ painting }: { painting: Painting }) {
             >
               {painting.title}
             </h3>
-            <p className="text-sm text-black/50 mt-1.5 leading-relaxed">{painting.subtitle}</p>
           </div>
 
           <div className="flex items-center gap-3 text-[11px] tracking-[0.15em] uppercase text-black/35">

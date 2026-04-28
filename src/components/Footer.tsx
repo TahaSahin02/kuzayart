@@ -34,10 +34,6 @@ export default function Footer() {
                 KuzayArt
               </span>
             </Link>
-            <p className="mt-4 text-sm leading-relaxed max-w-[200px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-              Didem Kuzay&apos;ın özgün yağlıboya eserleri. Doğanın dramatik
-              güzelliğini tuvale taşıyan koleksiyon.
-            </p>
           </div>
 
           {/* Koleksiyon */}
