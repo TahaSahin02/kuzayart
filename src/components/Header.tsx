@@ -16,7 +16,7 @@ export default function Header() {
 
   const navLinks = [
     { label: "Galeri", href: "#gallery" },
-    { label: "Hakkında", href: "#about" },
+    { label: "Hakkında", href: "/hakkinda" },
     { label: "Koleksiyon", href: "#collection" },
     { label: "İletişim", href: "#contact" },
   ];
