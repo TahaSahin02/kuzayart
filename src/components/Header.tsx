@@ -15,10 +15,9 @@ export default function Header() {
   }, []);
 
   const navLinks = [
-    { label: "Galeri", href: "#gallery" },
+    { label: "Koleksiyon", href: "/#collection" },
     { label: "Hakkında", href: "/hakkinda" },
-    { label: "Koleksiyon", href: "#collection" },
-    { label: "İletişim", href: "#contact" },
+    { label: "İletişim", href: "/#contact" },
   ];
 
   return (
@@ -32,7 +31,7 @@ export default function Header() {
         borderBottom: scrolled ? "1px solid rgba(201,169,110,0.12)" : "none",
       }}
     >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 h-[72px] flex items-center justify-between">
+      <div className="max-w-[1400px] mx-auto h-[72px] flex items-center justify-between" style={{ paddingLeft: "48px", paddingRight: "48px" }}>
         {/* Logo */}
         <Link href="/" className="flex items-center group">
           <span
