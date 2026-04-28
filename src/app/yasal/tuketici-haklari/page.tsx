@@ -18,23 +18,27 @@ export default function TuketiciHaklari() {
           ),
         },
         {
-          heading: "2. Ayıplı Eser Bildirimi ve Haklar",
+          heading: "2. Sorun Bildirimi",
           content: (
-            <>
-              <p>
-                Satın alınan eserin web sitesinde açıklanan niteliklere (boyut, teknik, malzeme,
-                imza) uymaması ya da eserde üretim kaynaklı kusur bulunması durumunda eser,
-                &quot;ayıplı mal&quot; sayılır. Bu durumda alıcı aşağıdaki seçeneklerden birini
-                kullanabilir:
-              </p>
-              <ul className="mt-2 flex flex-col gap-1 pl-4" style={{ listStyle: "disc" }}>
-                <li>Bedel iadesini de içeren sözleşmeden dönme</li>
-                <li>
-                  Eşdeğer özgün eserle değişim (stok ve sanatçı onayına bağlı olarak)
-                </li>
-                <li>Ayıp oranında satış bedelinden indirim talep etme</li>
-              </ul>
-            </>
+            <p>
+              Satın alınan eserin web sitesinde açıklanan niteliklere (boyut, teknik, imza)
+              uymaması ya da kargo sürecinde hasar görmesi durumunda, teslim tarihinden itibaren{" "}
+              <strong style={{ color: "#f0ece4" }}>2 iş günü</strong> içinde fotoğraflı
+              belgeyle birlikte bizimle iletişime geçin. Her sorunu ciddiye alır, en kısa sürede
+              dönüş yaparız. Satın alınan eserler için iade veya cayma söz konusu
+              olmamakla birlikte tarafımıza ulaşan her meşru sorunu çözmek için çaba gösteririz.
+              <br />
+              <br />
+              E-posta:{" "}
+              <a href="mailto:info@kuzayart.com" style={{ color: "#c9a96e" }}>
+                info@kuzayart.com
+              </a>
+              <br />
+              Telefon:{" "}
+              <a href="tel:+905332760897" style={{ color: "#c9a96e" }}>
+                +90 533 276 08 97
+              </a>
+            </p>
           ),
         },
         {

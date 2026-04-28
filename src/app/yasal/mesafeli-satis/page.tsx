@@ -71,32 +71,24 @@ export default function MesafeliSatis() {
           ),
         },
         {
-          heading: "Madde 5 — Cayma Hakkı ve Koşulları",
+          heading: "Madde 5 — Cayma Hakkı",
           content: (
-            <>
-              <p>
-                Alıcı, ürünü teslim aldığı tarihten itibaren 14 (on dört) gün içinde herhangi
-                bir gerekçe göstermeksizin cayma hakkını kullanabilir.
-              </p>
-              <p className="mt-2">
-                Cayma hakkının kullanılabilmesi için aşağıdaki koşulların tamamının sağlanması
-                zorunludur:
-              </p>
-              <ul className="mt-2 flex flex-col gap-1 pl-4" style={{ listStyle: "disc" }}>
-                <li>Eserin hasarsız, fiziksel olarak sağlam ve orijinal durumda olması</li>
-                <li>
-                  Beraberindeki sanatçı imzalı özgünlük sertifikasının eksiksiz iade edilmesi
-                </li>
-                <li>Orijinal ambalajında veya eşdeğer koruyucu ambalajda paketlenmesi</li>
-              </ul>
-              <p className="mt-2">
-                İade kargo ücreti alıcıya aittir. Cayma bildirimi{" "}
-                <a href="mailto:info@kuzayart.com" style={{ color: "#c9a96e" }}>
-                  info@kuzayart.com
-                </a>{" "}
-                adresine yazılı olarak iletilmelidir.
-              </p>
-            </>
+            <p>
+              KuzayArt&apos;ta satışa sunulan tüm eserler, sanatçı tarafından özgün olarak
+              üretilmiş biricik ve tekrarlanamaz nitelikte yağlıboya tablolardır. Bu nitelikleri
+              nedeniyle satın alınan eserler için{" "}
+              <strong style={{ color: "#f0ece4" }}>
+                iade ve cayma hakkı uygulanmamaktadır.
+              </strong>{" "}
+              Kargo hasarı veya yanlış teslimat gibi durumlarda doğrudan iletişime geçilmelidir:{" "}
+              <a href="mailto:info@kuzayart.com" style={{ color: "#c9a96e" }}>
+                info@kuzayart.com
+              </a>{" "}
+              /{" "}
+              <a href="tel:+905332760897" style={{ color: "#c9a96e" }}>
+                +90 533 276 08 97
+              </a>
+            </p>
           ),
         },
         {

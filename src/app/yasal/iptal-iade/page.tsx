@@ -8,12 +8,28 @@ export default function IptalIade() {
       title="İptal & İade Politikası"
       sections={[
         {
-          heading: "1. Cayma Hakkı",
+          heading: "1. İade Kabul Edilmemektedir",
           content: (
             <p>
-              Alıcı, ürünü teslim aldığı tarihten itibaren 14 (on dört) gün içinde herhangi bir
-              gerekçe göstermeksizin cayma hakkını kullanabilir. Cayma bildirimi aşağıdaki
-              iletişim kanallarından biri aracılığıyla KuzayArt&apos;a iletilmelidir:
+              KuzayArt&apos;ta satışa sunulan tüm eserler, Didem Kuzay tarafından özgün olarak
+              üretilmiş, tek kopya orijinal yağlıboya tablolardır. Her eser biricik ve
+              tekrarlanamaz nitelikte olduğundan,{" "}
+              <strong style={{ color: "#f0ece4" }}>
+                satın alınan eserler için hiçbir koşulda iade veya cayma hakkı
+                kabul edilmemektedir.
+              </strong>{" "}
+              Sipariş tamamlandıktan sonra iptal talebi de işleme alınmaz.
+            </p>
+          ),
+        },
+        {
+          heading: "2. Satın Almadan Önce",
+          content: (
+            <p>
+              Sipariş vermeden önce eserin boyutu, tekniği, renk tonu ve genel görünümü hakkında
+              tüm detayları dikkatlice incelemenizi öneririz. Herhangi bir sorunuz veya görmek
+              istediğiniz ek fotoğraf/video talebiniz varsa, sipariş öncesinde bizimle iletişime
+              geçebilirsiniz:
               <br />
               <br />
               E-posta:{" "}
@@ -29,75 +45,62 @@ export default function IptalIade() {
           ),
         },
         {
-          heading: "2. İade Koşulları",
-          content: (
-            <>
-              <p>Cayma hakkı kapsamında iade edilecek eserin aşağıdaki koşulları sağlaması zorunludur:</p>
-              <ul className="mt-2 flex flex-col gap-1 pl-4" style={{ listStyle: "disc" }}>
-                <li>Eser fiziksel olarak hasarsız ve orijinal durumda olmalıdır</li>
-                <li>
-                  Beraberindeki sanatçı imzalı özgünlük sertifikası eksiksiz ve sağlam iade
-                  edilmelidir
-                </li>
-                <li>
-                  Eser, orijinal ambalajında veya aynı koruma düzeyini sağlayan eşdeğer bir
-                  ambalajda gönderilmelidir
-                </li>
-              </ul>
-              <p className="mt-3">
-                Bu koşullardan herhangi biri sağlanmadığı takdirde KuzayArt iade talebini
-                reddetme hakkını saklı tutar.
-              </p>
-            </>
-          ),
-        },
-        {
-          heading: "3. İade Edilemeyen Durumlar",
-          content: (
-            <>
-              <p>Aşağıdaki durumlarda iade ve cayma hakkı kullanılamaz:</p>
-              <ul className="mt-2 flex flex-col gap-1 pl-4" style={{ listStyle: "disc" }}>
-                <li>Eserin alıcı kaynaklı fiziksel hasar görmesi (çizik, kırık, nem hasarı vb.)</li>
-                <li>Özgünlük sertifikasının kaybolması veya tahrip edilmesi</li>
-                <li>
-                  Eserin herhangi bir şekilde restore edilmeye, çerçevelenmeye veya yüzeyine
-                  müdahale edilmeye çalışılması
-                </li>
-                <li>14 günlük yasal cayma süresinin geçmiş olması</li>
-              </ul>
-            </>
-          ),
-        },
-        {
-          heading: "4. Nakliye Hasarı / Ayıplı Eser",
+          heading: "3. Kargo Hasarı",
           content: (
             <p>
-              Eser, web sitesinde belirtilen özelliklerden (boyut, teknik, imza) farklıysa veya
-              kargo sürecinde hasar gördüyse, teslim tarihinden itibaren{" "}
-              <strong style={{ color: "#f0ece4" }}>2 iş günü</strong> içinde fotoğraflı bildirim
-              yapılması gerekmektedir. Bu durumlarda iade kargo ücreti KuzayArt tarafından
-              karşılanır.
+              Eser, kargo sürecinde hasar görmüş olarak elinize ulaştıysa panik yapmayın — bu
+              durumu çözmek için buradayız. Teslim tarihinden itibaren{" "}
+              <strong style={{ color: "#f0ece4" }}>2 iş günü</strong> içinde hasarın
+              fotoğraflı belgesiyle birlikte bizimle iletişime geçin. Duruma göre en uygun
+              çözümü birlikte bulacağız.
+              <br />
+              <br />
+              E-posta:{" "}
+              <a href="mailto:info@kuzayart.com" style={{ color: "#c9a96e" }}>
+                info@kuzayart.com
+              </a>
+              <br />
+              Telefon:{" "}
+              <a href="tel:+905332760897" style={{ color: "#c9a96e" }}>
+                +90 533 276 08 97
+              </a>
+              <br />
+              <br />
+              2 iş günü geçtikten sonra yapılan kargo hasarı bildirimleri değerlendirmeye
+              alınmayacaktır.
             </p>
           ),
         },
         {
-          heading: "5. İade Kargo Ücreti",
+          heading: "4. Yanlış veya Eksik Teslimat",
           content: (
             <p>
-              Cayma hakkı kapsamındaki iadelerde iade kargo ücreti alıcıya aittir. Ayıplı veya
-              yanlış ürün teslimatlarında ise kargo masrafları KuzayArt tarafından üstlenilir.
+              Sipariş ettiğinizden farklı bir eser elinize ulaştıysa ya da özgünlük sertifikası
+              eksikse, teslim tarihinden itibaren{" "}
+              <strong style={{ color: "#f0ece4" }}>2 iş günü</strong> içinde fotoğraflı
+              belgeyle birlikte iletişime geçin. Hata tarafımıza aitse gerekli düzeltmeyi
+              sağlarız.
             </p>
           ),
         },
         {
-          heading: "6. Para İadesi",
+          heading: "5. Diğer Konular",
           content: (
             <p>
-              İade edilen eserin KuzayArt tarafından teslim alınmasının ardından, ürünün
-              belirtilen koşullara uygunluğu incelenir. Onaylanan iadelerde ödeme tutarı, iade
-              onay tarihinden itibaren en geç{" "}
-              <strong style={{ color: "#f0ece4" }}>14 iş günü</strong> içinde orijinal ödeme
-              yöntemiyle (Stripe üzerinden) iade edilir.
+              Aklınıza takılan ya da yukarıdaki başlıklara girmeyen herhangi bir konu için
+              doğrudan bizimle iletişime geçin. Her sorunu ciddiye alır, dürüst ve hızlı bir
+              yanıt veririz.
+              <br />
+              <br />
+              E-posta:{" "}
+              <a href="mailto:info@kuzayart.com" style={{ color: "#c9a96e" }}>
+                info@kuzayart.com
+              </a>
+              <br />
+              Telefon:{" "}
+              <a href="tel:+905332760897" style={{ color: "#c9a96e" }}>
+                +90 533 276 08 97
+              </a>
             </p>
           ),
         },
