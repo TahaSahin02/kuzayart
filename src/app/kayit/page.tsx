@@ -104,19 +104,36 @@ export default function Kayit() {
               </p>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 py-4 text-xs tracking-[0.25em] uppercase transition-all duration-300"
-              style={{
-                background: loading ? "rgba(201,169,110,0.5)" : "#c9a96e",
-                color: "#0a0a0a",
-                fontWeight: 500,
-                cursor: loading ? "not-allowed" : "pointer",
-              }}
-            >
-              {loading ? "Kayıt yapılıyor..." : "Kayıt Ol"}
-            </button>
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
+              <button
+                type="submit"
+                disabled={loading}
+                className="text-xs tracking-[0.3em] uppercase transition-all duration-300"
+                style={{
+                  background: "transparent",
+                  border: `1px solid ${loading ? "rgba(201,169,110,0.3)" : "#c9a96e"}`,
+                  color: loading ? "rgba(201,169,110,0.4)" : "#c9a96e",
+                  padding: "14px 56px",
+                  fontWeight: 400,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  letterSpacing: "0.3em",
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.background = "#c9a96e";
+                    e.currentTarget.style.color = "#0a0a0a";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "#c9a96e";
+                  }
+                }}
+              >
+                {loading ? "Kayıt yapılıyor..." : "Kayıt Ol"}
+              </button>
+            </div>
           </form>
 
           <p className="mt-8 text-sm text-center" style={{ color: "rgba(255,255,255,0.35)" }}>
