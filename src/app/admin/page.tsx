@@ -7,12 +7,16 @@ interface Order {
   merchant_oid: string;
   painting_titles: string;
   amount_cents: number;
+  amount_eur_cents: number | null;
   currency: string;
   status: string;
   user_name: string;
   user_email: string;
   user_phone: string;
   user_address: string;
+  user_city: string | null;
+  user_postal_code: string | null;
+  user_country: string | null;
   created_at: string;
 }
 
@@ -217,6 +221,8 @@ export default function Admin() {
                   <th style={thStyle}>Sipariş No</th>
                   <th style={thStyle}>Eser</th>
                   <th style={thStyle}>Müşteri</th>
+                  <th style={thStyle}>İletişim</th>
+                  <th style={thStyle}>Teslimat Adresi</th>
                   <th style={thStyle}>Tutar</th>
                   <th style={thStyle}>Durum</th>
                   <th style={thStyle}>Tarih</th>
@@ -225,6 +231,9 @@ export default function Admin() {
               <tbody>
                 {data!.orders.map((o) => {
                   const s = statusLabel[o.status] ?? { text: o.status, color: "#fff" };
+                  const eurAmountStr = o.amount_eur_cents
+                    ? fmt(o.amount_eur_cents, "EUR")
+                    : null;
                   return (
                     <tr key={o.id}>
                       <td style={tdStyle}>
@@ -236,8 +245,26 @@ export default function Admin() {
                         <br />
                         <span style={{ fontSize: "12px" }}>{o.user_email}</span>
                       </td>
+                      <td style={tdStyle}>
+                        <span style={{ fontSize: "12px", color: "#f0ece4" }}>{o.user_phone || "—"}</span>
+                      </td>
+                      <td style={{ ...tdStyle, maxWidth: "200px" }}>
+                        <span style={{ fontSize: "12px", display: "block", lineHeight: 1.5 }}>
+                          {o.user_address || "—"}
+                        </span>
+                        {(o.user_city || o.user_postal_code || o.user_country) && (
+                          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", display: "block", marginTop: "2px" }}>
+                            {[o.user_city, o.user_postal_code, o.user_country].filter(Boolean).join(", ")}
+                          </span>
+                        )}
+                      </td>
                       <td style={{ ...tdStyle, color: "#f0ece4" }}>
-                        {fmt(o.amount_cents, o.currency)}
+                        <span style={{ display: "block" }}>{fmt(o.amount_cents, o.currency)}</span>
+                        {eurAmountStr && (
+                          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", display: "block" }}>
+                            {eurAmountStr}
+                          </span>
+                        )}
                       </td>
                       <td style={tdStyle}>
                         <span

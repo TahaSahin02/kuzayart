@@ -9,8 +9,12 @@ export async function GET() {
 
   const orders = await sql`
     SELECT
-      o.id, o.merchant_oid, o.painting_titles, o.amount_cents, o.currency,
-      o.status, o.user_name, o.user_email, o.user_phone, o.user_address, o.created_at
+      o.id, o.merchant_oid, o.painting_titles,
+      o.amount_cents, o.amount_eur_cents, o.currency,
+      o.status, o.user_name, o.user_email,
+      o.user_phone, o.user_address,
+      o.user_city, o.user_postal_code, o.user_country,
+      o.created_at
     FROM orders o
     ORDER BY o.created_at DESC
   `;
