@@ -118,23 +118,46 @@ export async function POST(req: NextRequest) {
     paytr_token,
   });
 
-  // Save pending order with all address fields
-  await sql`
-    INSERT INTO orders (
-      user_id, merchant_oid, painting_ids, painting_titles,
-      amount_cents, amount_eur_cents, currency, status,
-      user_name, user_email, user_phone, user_address,
-      user_city, user_postal_code, user_country
-    ) VALUES (
-      ${user.id}, ${merchant_oid},
-      ${JSON.stringify(resolvedItems.map((i) => i.painting.id))},
-      ${resolvedItems.map((i) => `${i.painting.title}${i.type === "print" ? " (Baskı)" : ""}`).join(", ")},
-      ${paymentCents}, ${Math.round(totalEUR * 100)}, ${currency}, 'pending',
-      ${fullName}, ${user.email}, ${phone}, ${fullAddress},
-      ${city}, ${postalCode}, ${country}
-    )
-    ON CONFLICT (merchant_oid) DO NOTHING
-  `;
+  // Save pending order — try with all columns, fall back if migration not yet applied
+  try {
+    await sql`
+      INSERT INTO orders (
+        user_id, merchant_oid, painting_ids, painting_titles,
+        amount_cents, amount_eur_cents, currency, status,
+        user_name, user_email, user_phone, user_address,
+        user_city, user_postal_code, user_country
+      ) VALUES (
+        ${user.id}, ${merchant_oid},
+        ${JSON.stringify(resolvedItems.map((i) => i.painting.id))},
+        ${resolvedItems.map((i) => `${i.painting.title}${i.type === "print" ? " (Baskı)" : ""}`).join(", ")},
+        ${paymentCents}, ${Math.round(totalEUR * 100)}, ${currency}, 'pending',
+        ${fullName}, ${user.email}, ${phone}, ${fullAddress},
+        ${city}, ${postalCode}, ${country}
+      )
+      ON CONFLICT (merchant_oid) DO NOTHING
+    `;
+  } catch (err: unknown) {
+    // Column might not exist yet if db-init hasn't been run — use basic insert
+    const code = (err as Record<string, unknown>)?.code;
+    if (code === "42703" || code === "42P01") {
+      await sql`
+        INSERT INTO orders (
+          user_id, merchant_oid, painting_ids, painting_titles,
+          amount_cents, currency, status,
+          user_name, user_email, user_phone, user_address
+        ) VALUES (
+          ${user.id}, ${merchant_oid},
+          ${JSON.stringify(resolvedItems.map((i) => i.painting.id))},
+          ${resolvedItems.map((i) => `${i.painting.title}${i.type === "print" ? " (Baskı)" : ""}`).join(", ")},
+          ${paymentCents}, ${currency}, 'pending',
+          ${fullName}, ${user.email}, ${phone}, ${fullAddress}
+        )
+        ON CONFLICT (merchant_oid) DO NOTHING
+      `;
+    } else {
+      throw err;
+    }
+  }
 
   const resp = await fetch("https://www.paytr.com/odeme/api/get-token", {
     method: "POST",
