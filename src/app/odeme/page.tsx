@@ -482,16 +482,16 @@ export default function Odeme() {
                       <p style={{ fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.2)", marginBottom: "8px" }}>
                         {t("checkout.approxConversion")}
                       </p>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>USD</span>
-                          <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.1rem", color: "rgba(255,255,255,0.55)" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                          <span style={{ fontSize: "13px", letterSpacing: "0.12em", color: "rgba(255,255,255,0.4)" }}>USD</span>
+                          <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.7rem", fontWeight: 300, color: "rgba(255,255,255,0.7)" }}>
                             {fmtUsd(total * usdRate)}
                           </span>
                         </div>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>TRY</span>
-                          <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.1rem", color: "#c9a96e" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                          <span style={{ fontSize: "13px", letterSpacing: "0.12em", color: "rgba(255,255,255,0.4)" }}>TRY</span>
+                          <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.7rem", fontWeight: 300, color: "#c9a96e" }}>
                             {fmtTry(total * tryRate)}
                           </span>
                         </div>
