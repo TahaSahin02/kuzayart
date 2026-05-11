@@ -2,15 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLang } from "@/contexts/LanguageContext";
 
 export default function Footer() {
+  const { t } = useLang();
   const [email, setEmail] = useState("");
 
+  const legalLinks = [
+    { key: "footer.terms",    href: "/yasal/kullanim-sartlari" },
+    { key: "footer.privacy",  href: "/yasal/gizlilik-politikasi" },
+    { key: "footer.sales",    href: "/yasal/mesafeli-satis" },
+    { key: "footer.returns",  href: "/yasal/iptal-iade" },
+    { key: "footer.consumer", href: "/yasal/tuketici-haklari" },
+    { key: "footer.payment",  href: "/yasal/odeme-teslimat" },
+  ];
+
   return (
-    <footer
-      id="contact"
-      style={{ background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)" }}
-    >
+    <footer id="contact" style={{ background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
       <div
         style={{
           maxWidth: "1400px",
@@ -36,83 +44,78 @@ export default function Footer() {
             </Link>
           </div>
 
-          {/* Koleksiyon */}
+          {/* Collection */}
           <div>
             <p className="text-xs font-semibold tracking-[0.15em] uppercase mb-5" style={{ color: "rgba(255,255,255,0.5)" }}>
-              Koleksiyon
+              {t("footer.collectionLabel")}
             </p>
             <ul className="flex flex-col gap-3">
-              {["Tüm Eserler", "Deniz Manzaraları", "Gökyüzü & Bulut", "Gece Sahneleri"].map((item) => (
-                <li key={item}>
-                  <a href="#" className="text-sm transition-colors duration-200" style={{ color: "rgba(255,255,255,0.45)" }}
+              {(["footer.allWorks", "footer.seascapes", "footer.sky", "footer.night"] as const).map((key) => (
+                <li key={key}>
+                  <a
+                    href="#"
+                    className="text-sm transition-colors duration-200"
+                    style={{ color: "rgba(255,255,255,0.45)" }}
                     onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
                     onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
                   >
-                    {item}
+                    {t(key)}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Yasal */}
+          {/* Legal */}
           <div>
             <p className="text-xs font-semibold tracking-[0.15em] uppercase mb-5" style={{ color: "rgba(255,255,255,0.5)" }}>
-              Yasal
+              {t("footer.legalLabel")}
             </p>
             <ul className="flex flex-col gap-3">
-              {[
-                { label: "Kullanım Şartları", href: "/yasal/kullanim-sartlari" },
-                { label: "Gizlilik Politikası", href: "/yasal/gizlilik-politikasi" },
-                { label: "Mesafeli Satış", href: "/yasal/mesafeli-satis" },
-                { label: "İptal & İade", href: "/yasal/iptal-iade" },
-                { label: "Tüketici Hakları", href: "/yasal/tuketici-haklari" },
-                { label: "Ödeme & Teslimat", href: "/yasal/odeme-teslimat" },
-              ].map((item) => (
+              {legalLinks.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-sm transition-colors duration-200" style={{ color: "rgba(255,255,255,0.45)" }}
+                  <Link
+                    href={item.href}
+                    className="text-sm transition-colors duration-200"
+                    style={{ color: "rgba(255,255,255,0.45)" }}
                     onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
                     onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
                   >
-                    {item.label}
+                    {t(item.key)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Bülten */}
+          {/* Newsletter */}
           <div>
             <p className="text-xs font-semibold tracking-[0.15em] uppercase mb-5" style={{ color: "rgba(255,255,255,0.5)" }}>
-              Bülten
+              {t("footer.newsletterLabel")}
             </p>
             <p className="text-sm leading-relaxed mb-5 max-w-[200px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-              Yeni eserler ve özel koleksiyonlar için listeye katıl.
+              {t("footer.newsletterBody")}
             </p>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="E-posta adresin"
+              placeholder={t("footer.emailPlaceholder")}
               className="w-full text-sm px-4 py-3 mb-3 outline-none"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                color: "#fff",
-              }}
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#fff" }}
             />
             <button
               className="w-full py-3 text-sm font-medium tracking-wider transition-opacity duration-200 hover:opacity-80"
               style={{ background: "#f0ece4", color: "#0a0a0a" }}
             >
-              Abone Ol
+              {t("footer.subscribe")}
             </button>
           </div>
 
-          {/* Sosyal Medya */}
+          {/* Social */}
           <div>
             <p className="text-xs font-semibold tracking-[0.15em] uppercase mb-5" style={{ color: "rgba(255,255,255,0.5)" }}>
-              Sosyal Medya
+              {t("footer.socialLabel")}
             </p>
             <div className="flex items-center gap-3">
               <a
@@ -146,16 +149,16 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom */}
         <div
           className="mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
         >
           <p className="text-xs tracking-wider" style={{ color: "rgba(255,255,255,0.2)" }}>
-            © {new Date().getFullYear()} KuzayArt — Tüm hakları saklıdır.
+            © {new Date().getFullYear()} KuzayArt — {t("footer.copyright")}
           </p>
           <p className="text-xs tracking-wider" style={{ color: "rgba(255,255,255,0.15)" }}>
-            Didem Kuzay tarafından yaratılmıştır.
+            {t("footer.credit")}
           </p>
         </div>
       </div>

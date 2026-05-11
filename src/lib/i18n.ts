@@ -1,27 +1,34 @@
 export type Lang = "tr" | "en";
 
 const tr: Record<string, string> = {
-  // Nav
+  // ── Nav ──────────────────────────────────────────────────────
   "nav.collection": "Koleksiyon",
   "nav.about": "Hakkında",
   "nav.contact": "İletişim",
   "nav.account": "Hesabım",
   "nav.login": "Giriş Yap",
   "nav.cart": "Sepet",
-  // Product card
+
+  // ── Hero Carousel ────────────────────────────────────────────
+  "hero.medium": "Yağlı Boya · Tuval Üzeri",
+  "hero.cta": "Koleksiyonu Keşfet",
+
+  // ── Product card ─────────────────────────────────────────────
   "product.addToCart": "Sepete Ekle",
   "product.inCart": "Sepette ✓",
   "product.sold": "Satıldı",
   "product.price": "Fiyat",
   "product.zoom": "Yakınlaştır",
-  // Cart page
+
+  // ── Cart page ─────────────────────────────────────────────────
   "cart.shopping": "Alışveriş",
   "cart.title": "Sepetim",
   "cart.empty": "Sepetiniz boş.",
   "cart.browse": "Koleksiyona göz at →",
   "cart.total": "Toplam",
   "cart.checkout": "Satın Al",
-  // Checkout / Payment
+
+  // ── Checkout / Payment ────────────────────────────────────────
   "checkout.payment": "Ödeme",
   "checkout.title": "Sipariş Özeti",
   "checkout.total": "Toplam",
@@ -33,7 +40,8 @@ const tr: Record<string, string> = {
   "checkout.name": "Ad Soyad",
   "checkout.email": "E-posta",
   "checkout.securePay": "Güvenli Ödeme",
-  // Login
+
+  // ── Login ─────────────────────────────────────────────────────
   "login.subtitle": "Hesabınıza girin",
   "login.title": "Giriş Yap",
   "login.email": "E-posta",
@@ -42,7 +50,8 @@ const tr: Record<string, string> = {
   "login.loading": "Giriş yapılıyor...",
   "login.noAccount": "Hesabınız yok mu?",
   "login.registerLink": "Kayıt olun",
-  // Register
+
+  // ── Register ──────────────────────────────────────────────────
   "register.subtitle": "Yeni hesap",
   "register.title": "Kayıt Ol",
   "register.name": "Ad Soyad",
@@ -53,7 +62,8 @@ const tr: Record<string, string> = {
   "register.loading": "Kayıt yapılıyor...",
   "register.hasAccount": "Zaten hesabınız var mı?",
   "register.loginLink": "Giriş yapın",
-  // Panel
+
+  // ── Panel ─────────────────────────────────────────────────────
   "panel.subtitle": "Hesabım",
   "panel.orders": "Siparişlerim",
   "panel.noOrders": "Henüz siparişiniz yok.",
@@ -64,7 +74,8 @@ const tr: Record<string, string> = {
   "panel.status.pending": "Bekliyor",
   "panel.status.success": "Tamamlandı",
   "panel.status.failed": "Başarısız",
-  // Success / Fail
+
+  // ── Success / Fail ────────────────────────────────────────────
   "success.subtitle": "Teşekkürler",
   "success.title": "Ödemeniz Alındı",
   "success.body": "Siparişiniz başarıyla oluşturuldu. Kargo ve teslimat bilgileri e-posta adresinize iletilecektir.",
@@ -75,32 +86,98 @@ const tr: Record<string, string> = {
   "fail.body": "Ödeme işlemi tamamlanamadı. Kart bilgilerinizi kontrol edip tekrar deneyebilir ya da farklı bir ödeme yöntemi kullanabilirsiniz.",
   "fail.backToCart": "Sepete Dön",
   "fail.contact": "İletişim",
-  // Currency rate tooltip
-  "currency.liveRate": "Canlı Kur",
+
+  // ── About (Hakkında) ──────────────────────────────────────────
+  "about.artist": "Sanatçı",
+  "about.painter": "Yağlıboya Ressam",
+  "about.quote": "\"Her tablo, doğanın bir anını sonsuza taşıma çabasıdır. Fırtınanın tam öncesi, ayın suya değdiği o kesit — geçip giden ama iz bırakan an.\"",
+  "about.bio.label": "Biyografi",
+  "about.bio.title": "Doğanın Gücünü\nTuvale Taşımak",
+  "about.bio.p1": "Didem Kuzay, doğanın sert ve büyüleyici yüzüne odaklanan Türk bir yağlıboya ressam. Çalışmalarında fırtına öncesi gökyüzünün gerilimini, ayın denizle kurduğu sessiz diyaloğu ve alacakaranlığın suya yansıyan altın ışığını konu alıyor.",
+  "about.bio.p2": "Her eser, anlık bir duygunun tuval üzerinde kalıcı hale getirilmiş hali. Kuzay için resim yapmak, gözün yakaladığı ama belleğin tutamadığı o kısa anı geri çağırma çabasıdır: dalganın zirvesi, bulutların içine gömülen ışık, koyu suyun üzerinde titreyen gece.",
+  "about.bio.p3": "Yağlıboyanın katmanlı yapısı ve zengin dokusu, bu dramatik atmosferleri aktarmak için biçilmiş kaftandır. Kuzay, derinlik yaratmak amacıyla birden fazla renk tabakası uygular; son katman kurumadan taşınan fırça izleri ise tabloya ham ve canlı bir enerji katar.",
+  "about.bio.p4": "Tüm eserleri tek kopya ve özgündür. Her tablo, sanatçı imzası ve özgünlük sertifikasıyla birlikte teslim edilir.",
+  "about.approach.label": "Yaklaşım",
+  "about.t1.title": "Teknik",
+  "about.t1.body": "Klasik yağlıboya tekniğiyle çalışan Kuzay, ıslak üstüne ıslak (wet-on-wet) yöntemiyle renkleri birbirine karıştırarak doğanın yumuşak geçişlerini tuval üzerinde yeniden kurar.",
+  "about.t2.title": "Konu",
+  "about.t2.body": "Deniz manzaraları, dramatik gökyüzü ve gece sahneleri. İnsan figürünü dışarıda bırakan bu kompozisyonlar, izleyiciyi doğrudan doğayla yüz yüze getirir.",
+  "about.t3.title": "Eser",
+  "about.t3.body": "Her tablo yalnızca bir kez üretilir. Sanatçı imzalı özgünlük sertifikasıyla birlikte teslim edilen eserler, kişisel koleksiyon ve kurumsal mekânlar için tasarlanmıştır.",
+  "about.cta.label": "İletişim",
+  "about.cta.title": "Bir eser hakkında soru mu var?",
+  "about.cta.body": "Koleksiyon, ölçü veya teslimat hakkında merak ettikleriniz için doğrudan ulaşın.",
+  "about.cta.email": "E-posta Gönder",
+
+  // ── Contact (İletişim) ────────────────────────────────────────
+  "contact.label": "İletişim",
+  "contact.title": "Bir sorunuz mu var?",
+  "contact.intro": "Eserler hakkında soru sormak, ölçü veya teslimat detaylarını öğrenmek ya da sadece merhaba demek için yazın. En kısa sürede dönüş yaparım.",
+  "contact.emailLabel": "E-posta",
+  "contact.phoneLabel": "Telefon",
+  "contact.socialLabel": "Sosyal Medya",
+  "contact.formName": "Adınız",
+  "contact.formNamePlaceholder": "Adınız Soyadınız",
+  "contact.formEmail": "E-posta",
+  "contact.formEmailPlaceholder": "ornek@email.com",
+  "contact.formMessage": "Mesajınız",
+  "contact.formMessagePlaceholder": "Sormak istediğiniz şeyi yazın...",
+  "contact.send": "Gönder",
+  "contact.sentTitle": "Mesajınız iletildi.",
+  "contact.sentBody": "En kısa sürede size dönüş yapacağım.",
+  "contact.newMessage": "Yeni mesaj →",
+
+  // ── Footer ────────────────────────────────────────────────────
+  "footer.collectionLabel": "Koleksiyon",
+  "footer.allWorks": "Tüm Eserler",
+  "footer.seascapes": "Deniz Manzaraları",
+  "footer.sky": "Gökyüzü & Bulut",
+  "footer.night": "Gece Sahneleri",
+  "footer.legalLabel": "Yasal",
+  "footer.terms": "Kullanım Şartları",
+  "footer.privacy": "Gizlilik Politikası",
+  "footer.sales": "Mesafeli Satış",
+  "footer.returns": "İptal & İade",
+  "footer.consumer": "Tüketici Hakları",
+  "footer.payment": "Ödeme & Teslimat",
+  "footer.newsletterLabel": "Bülten",
+  "footer.newsletterBody": "Yeni eserler ve özel koleksiyonlar için listeye katıl.",
+  "footer.emailPlaceholder": "E-posta adresin",
+  "footer.subscribe": "Abone Ol",
+  "footer.socialLabel": "Sosyal Medya",
+  "footer.copyright": "Tüm hakları saklıdır.",
+  "footer.credit": "Didem Kuzay tarafından yaratılmıştır.",
 };
 
 const en: Record<string, string> = {
-  // Nav
+  // ── Nav ──────────────────────────────────────────────────────
   "nav.collection": "Collection",
   "nav.about": "About",
   "nav.contact": "Contact",
   "nav.account": "My Account",
   "nav.login": "Sign In",
   "nav.cart": "Cart",
-  // Product card
+
+  // ── Hero Carousel ────────────────────────────────────────────
+  "hero.medium": "Oil on Canvas",
+  "hero.cta": "Explore Collection",
+
+  // ── Product card ─────────────────────────────────────────────
   "product.addToCart": "Add to Cart",
   "product.inCart": "In Cart ✓",
   "product.sold": "Sold",
   "product.price": "Price",
   "product.zoom": "Zoom",
-  // Cart page
+
+  // ── Cart page ─────────────────────────────────────────────────
   "cart.shopping": "Shopping",
   "cart.title": "My Cart",
   "cart.empty": "Your cart is empty.",
   "cart.browse": "Browse collection →",
   "cart.total": "Total",
   "cart.checkout": "Checkout",
-  // Checkout / Payment
+
+  // ── Checkout / Payment ────────────────────────────────────────
   "checkout.payment": "Payment",
   "checkout.title": "Order Summary",
   "checkout.total": "Total",
@@ -112,7 +189,8 @@ const en: Record<string, string> = {
   "checkout.name": "Full Name",
   "checkout.email": "Email",
   "checkout.securePay": "Secure Payment",
-  // Login
+
+  // ── Login ─────────────────────────────────────────────────────
   "login.subtitle": "Sign into your account",
   "login.title": "Sign In",
   "login.email": "Email",
@@ -121,7 +199,8 @@ const en: Record<string, string> = {
   "login.loading": "Signing in...",
   "login.noAccount": "Don't have an account?",
   "login.registerLink": "Sign up",
-  // Register
+
+  // ── Register ──────────────────────────────────────────────────
   "register.subtitle": "New account",
   "register.title": "Sign Up",
   "register.name": "Full Name",
@@ -132,7 +211,8 @@ const en: Record<string, string> = {
   "register.loading": "Creating account...",
   "register.hasAccount": "Already have an account?",
   "register.loginLink": "Sign in",
-  // Panel
+
+  // ── Panel ─────────────────────────────────────────────────────
   "panel.subtitle": "My Account",
   "panel.orders": "My Orders",
   "panel.noOrders": "No orders yet.",
@@ -143,7 +223,8 @@ const en: Record<string, string> = {
   "panel.status.pending": "Pending",
   "panel.status.success": "Completed",
   "panel.status.failed": "Failed",
-  // Success / Fail
+
+  // ── Success / Fail ────────────────────────────────────────────
   "success.subtitle": "Thank you",
   "success.title": "Payment Received",
   "success.body": "Your order has been successfully placed. Shipping and delivery details will be sent to your email address.",
@@ -154,8 +235,67 @@ const en: Record<string, string> = {
   "fail.body": "The payment could not be completed. Please check your card details and try again, or use a different payment method.",
   "fail.backToCart": "Back to Cart",
   "fail.contact": "Contact",
-  // Currency rate tooltip
-  "currency.liveRate": "Live Rate",
+
+  // ── About ─────────────────────────────────────────────────────
+  "about.artist": "Artist",
+  "about.painter": "Oil Painter",
+  "about.quote": "\"Every painting is an effort to carry a moment of nature into eternity. The instant just before the storm, the sliver where moonlight meets water — the moment that passes, yet leaves a mark.\"",
+  "about.bio.label": "Biography",
+  "about.bio.title": "Bringing Nature's\nPower to Canvas",
+  "about.bio.p1": "Didem Kuzay is a Turkish oil painter focused on the raw and captivating face of nature. Her work captures the tension of pre-storm skies, the silent dialogue between moonlight and sea, and the golden light of dusk reflected on water.",
+  "about.bio.p2": "Each work is an instantaneous emotion made permanent on canvas. For Kuzay, painting is the act of recalling that brief moment the eye catches but memory cannot hold: the crest of a wave, light buried in clouds, night trembling on dark water.",
+  "about.bio.p3": "The layered structure and rich texture of oil paint are perfectly suited for conveying these dramatic atmospheres. Kuzay applies multiple layers of colour to create depth; brushstrokes carried through while the final layer is still wet give each painting a raw and living energy.",
+  "about.bio.p4": "All works are unique, one-of-a-kind pieces. Each painting is delivered with the artist's signature and a certificate of authenticity.",
+  "about.approach.label": "Approach",
+  "about.t1.title": "Technique",
+  "about.t1.body": "Working in the classical oil-painting tradition, Kuzay blends colours using the wet-on-wet method, reconstructing the soft transitions of nature on canvas.",
+  "about.t2.title": "Subject",
+  "about.t2.body": "Seascapes, dramatic skies, and night scenes. Compositions that exclude the human figure, bringing the viewer face to face with nature itself.",
+  "about.t3.title": "Work",
+  "about.t3.body": "Each painting is produced once and only once. Delivered with a signed certificate of authenticity, the works are designed for private collections and corporate spaces alike.",
+  "about.cta.label": "Contact",
+  "about.cta.title": "Have a question about a piece?",
+  "about.cta.body": "Reach out directly with any questions about the collection, dimensions, or delivery.",
+  "about.cta.email": "Send Email",
+
+  // ── Contact ───────────────────────────────────────────────────
+  "contact.label": "Contact",
+  "contact.title": "Have a question?",
+  "contact.intro": "Write to ask about a piece, learn dimensions or delivery details, or simply say hello. I'll get back to you as soon as possible.",
+  "contact.emailLabel": "Email",
+  "contact.phoneLabel": "Phone",
+  "contact.socialLabel": "Social Media",
+  "contact.formName": "Your Name",
+  "contact.formNamePlaceholder": "Full Name",
+  "contact.formEmail": "Email",
+  "contact.formEmailPlaceholder": "example@email.com",
+  "contact.formMessage": "Your Message",
+  "contact.formMessagePlaceholder": "Write what you'd like to ask...",
+  "contact.send": "Send",
+  "contact.sentTitle": "Message sent.",
+  "contact.sentBody": "I'll get back to you as soon as possible.",
+  "contact.newMessage": "New message →",
+
+  // ── Footer ────────────────────────────────────────────────────
+  "footer.collectionLabel": "Collection",
+  "footer.allWorks": "All Works",
+  "footer.seascapes": "Seascapes",
+  "footer.sky": "Sky & Clouds",
+  "footer.night": "Night Scenes",
+  "footer.legalLabel": "Legal",
+  "footer.terms": "Terms of Use",
+  "footer.privacy": "Privacy Policy",
+  "footer.sales": "Distance Sales",
+  "footer.returns": "Returns & Refunds",
+  "footer.consumer": "Consumer Rights",
+  "footer.payment": "Payment & Delivery",
+  "footer.newsletterLabel": "Newsletter",
+  "footer.newsletterBody": "Join the list for new works and exclusive collections.",
+  "footer.emailPlaceholder": "Your email",
+  "footer.subscribe": "Subscribe",
+  "footer.socialLabel": "Social Media",
+  "footer.copyright": "All rights reserved.",
+  "footer.credit": "Created by Didem Kuzay.",
 };
 
 export const translations: Record<Lang, Record<string, string>> = { tr, en };

@@ -46,17 +46,38 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       if (["EUR", "USD", "TRY"].includes(stored)) setCurrencyState(stored);
     } catch {}
 
-    // Fetch live EUR-based rates from Frankfurter (no API key needed)
-    fetch("https://api.frankfurter.app/latest?from=EUR&to=USD,TRY")
+    // Primary: open.er-api.com — updates every hour, no key needed
+    fetch("https://open.er-api.com/v6/latest/EUR")
       .then((r) => r.json())
       .then((data) => {
-        if (data?.rates?.USD && data?.rates?.TRY) {
+        if (data?.result === "success" && data?.rates?.USD && data?.rates?.TRY) {
           setRates({ USD: data.rates.USD, TRY: data.rates.TRY });
         } else {
-          setRates(FALLBACK_RATES);
+          // Fallback: Frankfurter (ECB daily)
+          return fetch("https://api.frankfurter.app/latest?from=EUR&to=USD,TRY")
+            .then((r) => r.json())
+            .then((d) => {
+              if (d?.rates?.USD && d?.rates?.TRY) {
+                setRates({ USD: d.rates.USD, TRY: d.rates.TRY });
+              } else {
+                setRates(FALLBACK_RATES);
+              }
+            });
         }
       })
-      .catch(() => setRates(FALLBACK_RATES));
+      .catch(() =>
+        // Last resort: Frankfurter
+        fetch("https://api.frankfurter.app/latest?from=EUR&to=USD,TRY")
+          .then((r) => r.json())
+          .then((d) => {
+            if (d?.rates?.USD && d?.rates?.TRY) {
+              setRates({ USD: d.rates.USD, TRY: d.rates.TRY });
+            } else {
+              setRates(FALLBACK_RATES);
+            }
+          })
+          .catch(() => setRates(FALLBACK_RATES))
+      );
   }, []);
 
   const setCurrency = (c: Currency) => {

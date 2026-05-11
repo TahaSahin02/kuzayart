@@ -3,37 +3,20 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useLang } from "@/contexts/LanguageContext";
 
+// titles are the same in both languages (painting names)
 const slides = [
-  {
-    src: "/paintings/tarama1.png",
-    title: "Fırtınanın Eşiğinde",
-    subtitle: "Yağlı Boya · Tuval Üzeri",
-    year: "2025",
-  },
-  {
-    src: "/paintings/tarama2.png",
-    title: "Akdeniz Dalgası",
-    subtitle: "Yağlı Boya · Tuval Üzeri",
-    year: "2025",
-  },
-  {
-    src: "/paintings/tarama3.png",
-    title: "Gece Koyu",
-    subtitle: "Yağlı Boya · Tuval Üzeri",
-    year: "2025",
-  },
-  {
-    src: "/paintings/tarama4.png",
-    title: "Altın Alacakaranlık",
-    subtitle: "Yağlı Boya · Tuval Üzeri",
-    year: "2026",
-  },
+  { src: "/paintings/tarama1.png", title: "Fırtınanın Eşiğinde", year: "2025" },
+  { src: "/paintings/tarama2.png", title: "Akdeniz Dalgası",       year: "2025" },
+  { src: "/paintings/tarama3.png", title: "Gece Koyu",              year: "2025" },
+  { src: "/paintings/tarama4.png", title: "Altın Alacakaranlık",    year: "2026" },
 ];
 
 const INTERVAL = 5000;
 
 export default function HeroCarousel() {
+  const { t } = useLang();
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
@@ -112,7 +95,7 @@ export default function HeroCarousel() {
           className="text-xs tracking-[0.35em] uppercase text-[#c9a96e] mb-2 opacity-90"
           style={{ fontFamily: "var(--font-geist-sans)" }}
         >
-          {slides[current].subtitle} · {slides[current].year}
+          {t("hero.medium")} · {slides[current].year}
         </p>
         <h1
           className="text-5xl lg:text-7xl font-light leading-[1.1] tracking-wide text-white mb-6"
@@ -125,7 +108,7 @@ export default function HeroCarousel() {
           className="inline-flex items-center gap-3 px-7 py-3 text-xs tracking-[0.25em] uppercase border transition-all duration-400 hover:bg-[#c9a96e] hover:border-[#c9a96e] hover:text-black"
           style={{ borderColor: "rgba(201,169,110,0.6)", color: "#e8d5a3" }}
         >
-          Koleksiyonu Keşfet
+          {t("hero.cta")}
         </a>
       </div>
 

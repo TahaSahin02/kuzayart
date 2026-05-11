@@ -5,16 +5,27 @@ import { sql } from "@/lib/db";
 import { paintings } from "@/lib/paintings";
 
 async function fetchEurToTry(): Promise<number> {
+  // Primary: open.er-api.com (hourly updates)
   try {
-    const res = await fetch("https://api.frankfurter.app/latest?from=EUR&to=TRY", {
-      next: { revalidate: 300 }, // cache 5 min
+    const res = await fetch("https://open.er-api.com/v6/latest/EUR", {
+      next: { revalidate: 1800 },
     });
     const data = await res.json();
-    if (data?.rates?.TRY && typeof data.rates.TRY === "number") {
+    if (data?.result === "success" && typeof data?.rates?.TRY === "number") {
       return data.rates.TRY;
     }
   } catch {}
-  return 38.5; // fallback rate
+  // Fallback: Frankfurter (ECB daily)
+  try {
+    const res = await fetch("https://api.frankfurter.app/latest?from=EUR&to=TRY", {
+      next: { revalidate: 3600 },
+    });
+    const data = await res.json();
+    if (typeof data?.rates?.TRY === "number") {
+      return data.rates.TRY;
+    }
+  } catch {}
+  return 40.0; // hardcoded last-resort fallback
 }
 
 export async function POST(req: NextRequest) {

@@ -1,20 +1,26 @@
+"use client";
+
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
-export const metadata = { title: "Hakkında — KuzayArt" };
+import { useLang } from "@/contexts/LanguageContext";
 
 export default function Hakkinda() {
+  const { t } = useLang();
+
+  const approach = [
+    { no: "01", titleKey: "about.t1.title", bodyKey: "about.t1.body" },
+    { no: "02", titleKey: "about.t2.title", bodyKey: "about.t2.body" },
+    { no: "03", titleKey: "about.t3.title", bodyKey: "about.t3.body" },
+  ];
+
   return (
     <>
       <Header />
       <main style={{ background: "#0a0a0a" }}>
 
         {/* Hero */}
-        <section
-          className="relative w-full flex items-end overflow-hidden"
-          style={{ height: "100svh" }}
-        >
+        <section className="relative w-full flex items-end overflow-hidden" style={{ height: "100svh" }}>
           <Image
             src="/paintings/tarama3.png"
             alt="Didem Kuzay"
@@ -24,7 +30,6 @@ export default function Hakkinda() {
             className="object-cover object-center"
             priority
           />
-          {/* Gradient */}
           <div
             className="absolute inset-0"
             style={{
@@ -43,11 +48,8 @@ export default function Hakkinda() {
               paddingBottom: "80px",
             }}
           >
-            <p
-              className="text-xs tracking-[0.35em] uppercase mb-4"
-              style={{ color: "#c9a96e", opacity: 0.9 }}
-            >
-              Sanatçı
+            <p className="text-xs tracking-[0.35em] uppercase mb-4" style={{ color: "#c9a96e", opacity: 0.9 }}>
+              {t("about.artist")}
             </p>
             <h1
               className="font-light leading-none"
@@ -60,32 +62,15 @@ export default function Hakkinda() {
             >
               Didem Kuzay
             </h1>
-            <p
-              className="mt-5 text-sm tracking-[0.15em] uppercase"
-              style={{ color: "rgba(255,255,255,0.35)" }}
-            >
-              Yağlıboya Ressam
+            <p className="mt-5 text-sm tracking-[0.15em] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>
+              {t("about.painter")}
             </p>
           </div>
         </section>
 
-        {/* Alıntı */}
-        <section
-          style={{
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-            paddingTop: "96px",
-            paddingBottom: "96px",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "900px",
-              marginLeft: "auto",
-              marginRight: "auto",
-              paddingLeft: "24px",
-              paddingRight: "24px",
-            }}
-          >
+        {/* Quote */}
+        <section style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", paddingTop: "96px", paddingBottom: "96px" }}>
+          <div style={{ maxWidth: "900px", marginLeft: "auto", marginRight: "auto", paddingLeft: "24px", paddingRight: "24px" }}>
             <blockquote
               className="font-light leading-relaxed text-center"
               style={{
@@ -95,150 +80,61 @@ export default function Hakkinda() {
                 letterSpacing: "0.01em",
               }}
             >
-              &ldquo;Her tablo, doğanın bir anını sonsuza taşıma çabasıdır.
-              Fırtınanın tam öncesi, ayın suya değdiği o kesit —
-              geçip giden ama iz bırakan an.&rdquo;
+              {t("about.quote")}
             </blockquote>
           </div>
         </section>
 
-        {/* Biyografi */}
-        <section
-          style={{
-            paddingTop: "100px",
-            paddingBottom: "100px",
-          }}
-        >
+        {/* Biography */}
+        <section style={{ paddingTop: "100px", paddingBottom: "100px" }}>
           <div
             className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-start"
-            style={{
-              maxWidth: "1400px",
-              marginLeft: "auto",
-              marginRight: "auto",
-              paddingLeft: "24px",
-              paddingRight: "24px",
-            }}
+            style={{ maxWidth: "1400px", marginLeft: "auto", marginRight: "auto", paddingLeft: "24px", paddingRight: "24px" }}
           >
-            {/* Sol — başlık */}
             <div className="md:sticky top-32">
-              <p
-                className="text-xs tracking-[0.35em] uppercase mb-4"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-              >
-                Biyografi
+              <p className="text-xs tracking-[0.35em] uppercase mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {t("about.bio.label")}
               </p>
               <h2
                 className="font-light leading-tight"
-                style={{
-                  fontFamily: "var(--font-cormorant)",
-                  fontSize: "clamp(2.5rem, 5vw, 4rem)",
-                  color: "#f0ece4",
-                }}
+                style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(2.5rem, 5vw, 4rem)", color: "#f0ece4" }}
               >
-                Doğanın Gücünü
-                <br />
-                Tuvale Taşımak
+                {t("about.bio.title").split("\n").map((line, i) => (
+                  <span key={i}>{line}{i === 0 && <br />}</span>
+                ))}
               </h2>
-              <div
-                className="mt-8 w-12"
-                style={{ height: "1px", background: "#c9a96e", opacity: 0.5 }}
-              />
+              <div className="mt-8 w-12" style={{ height: "1px", background: "#c9a96e", opacity: 0.5 }} />
             </div>
 
-            {/* Sağ — metin */}
-            <div
-              className="flex flex-col gap-6 text-sm leading-loose"
-              style={{ color: "rgba(255,255,255,0.55)" }}
-            >
-              <p>
-                Didem Kuzay, doğanın sert ve büyüleyici yüzüne odaklanan Türk bir yağlıboya
-                ressam. Çalışmalarında fırtına öncesi gökyüzünün gerilimini, ayın denizle
-                kurduğu sessiz diyaloğu ve alacakaranlığın suya yansıyan altın ışığını
-                konu alıyor.
-              </p>
-              <p>
-                Her eser, anlık bir duygunun tuval üzerinde kalıcı hale getirilmiş hali.
-                Kuzay için resim yapmak, gözün yakaladığı ama belleğin tutamadığı o kısa
-                anı geri çağırma çabasıdır: dalganın zirvesi, bulutların içine gömülen ışık,
-                koyu suyun üzerinde titreyen gece.
-              </p>
-              <p>
-                Yağlıboyanın katmanlı yapısı ve zengin dokusu, bu dramatik atmosferleri
-                aktarmak için biçilmiş kaftandır. Kuzay, derinlik yaratmak amacıyla
-                birden fazla renk tabakası uygular; son katman kurumadan taşınan fırça
-                izleri ise tabloya ham ve canlı bir enerji katar.
-              </p>
-              <p>
-                Tüm eserleri tek kopya ve özgündür. Her tablo, sanatçı imzası ve
-                özgünlük sertifikasıyla birlikte teslim edilir.
-              </p>
+            <div className="flex flex-col gap-6 text-sm leading-loose" style={{ color: "rgba(255,255,255,0.55)" }}>
+              <p>{t("about.bio.p1")}</p>
+              <p>{t("about.bio.p2")}</p>
+              <p>{t("about.bio.p3")}</p>
+              <p>{t("about.bio.p4")}</p>
             </div>
           </div>
         </section>
 
-        {/* Yaklaşım — 3 sütun */}
-        <section
-          style={{
-            borderTop: "1px solid rgba(255,255,255,0.06)",
-            paddingTop: "100px",
-            paddingBottom: "100px",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "1400px",
-              marginLeft: "auto",
-              marginRight: "auto",
-              paddingLeft: "24px",
-              paddingRight: "24px",
-            }}
-          >
-            <p
-              className="text-xs tracking-[0.35em] uppercase mb-16"
-              style={{ color: "rgba(255,255,255,0.3)" }}
-            >
-              Yaklaşım
+        {/* Approach */}
+        <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "100px", paddingBottom: "100px" }}>
+          <div style={{ maxWidth: "1400px", marginLeft: "auto", marginRight: "auto", paddingLeft: "24px", paddingRight: "24px" }}>
+            <p className="text-xs tracking-[0.35em] uppercase mb-16" style={{ color: "rgba(255,255,255,0.3)" }}>
+              {t("about.approach.label")}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              {[
-                {
-                  no: "01",
-                  title: "Teknik",
-                  body: "Klasik yağlıboya tekniğiyle çalışan Kuzay, ıslak üstüne ıslak (wet-on-wet) yöntemiyle renkleri birbirine karıştırarak doğanın yumuşak geçişlerini tuval üzerinde yeniden kurar.",
-                },
-                {
-                  no: "02",
-                  title: "Konu",
-                  body: "Deniz manzaraları, dramatik gökyüzü ve gece sahneleri. İnsan figürünü dışarıda bırakan bu kompozisyonlar, izleyiciyi doğrudan doğayla yüz yüze getirir.",
-                },
-                {
-                  no: "03",
-                  title: "Eser",
-                  body: "Her tablo yalnızca bir kez üretilir. Sanatçı imzalı özgünlük sertifikasıyla birlikte teslim edilen eserler, kişisel koleksiyon ve kurumsal mekânlar için tasarlanmıştır.",
-                },
-              ].map((item) => (
+              {approach.map((item) => (
                 <div key={item.no}>
-                  <p
-                    className="text-xs tracking-[0.2em] mb-5"
-                    style={{ color: "#c9a96e", opacity: 0.7 }}
-                  >
+                  <p className="text-xs tracking-[0.2em] mb-5" style={{ color: "#c9a96e", opacity: 0.7 }}>
                     {item.no}
                   </p>
                   <h3
                     className="font-light mb-4"
-                    style={{
-                      fontFamily: "var(--font-cormorant)",
-                      fontSize: "1.5rem",
-                      color: "#f0ece4",
-                    }}
+                    style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.5rem", color: "#f0ece4" }}
                   >
-                    {item.title}
+                    {t(item.titleKey)}
                   </h3>
-                  <p
-                    className="text-sm leading-relaxed"
-                    style={{ color: "rgba(255,255,255,0.45)" }}
-                  >
-                    {item.body}
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    {t(item.bodyKey)}
                   </p>
                 </div>
               ))}
@@ -246,57 +142,31 @@ export default function Hakkinda() {
           </div>
         </section>
 
-        {/* İletişim CTA */}
-        <section
-          style={{
-            borderTop: "1px solid rgba(255,255,255,0.06)",
-            paddingTop: "100px",
-            paddingBottom: "120px",
-          }}
-        >
+        {/* CTA */}
+        <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "100px", paddingBottom: "120px" }}>
           <div
             className="text-center"
-            style={{
-              maxWidth: "600px",
-              marginLeft: "auto",
-              marginRight: "auto",
-              paddingLeft: "24px",
-              paddingRight: "24px",
-            }}
+            style={{ maxWidth: "600px", marginLeft: "auto", marginRight: "auto", paddingLeft: "24px", paddingRight: "24px" }}
           >
-            <p
-              className="text-xs tracking-[0.35em] uppercase mb-6"
-              style={{ color: "rgba(255,255,255,0.3)" }}
-            >
-              İletişim
+            <p className="text-xs tracking-[0.35em] uppercase mb-6" style={{ color: "rgba(255,255,255,0.3)" }}>
+              {t("about.cta.label")}
             </p>
             <h2
               className="font-light mb-8"
-              style={{
-                fontFamily: "var(--font-cormorant)",
-                fontSize: "clamp(2rem, 4vw, 3rem)",
-                color: "#f0ece4",
-              }}
+              style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(2rem, 4vw, 3rem)", color: "#f0ece4" }}
             >
-              Bir eser hakkında soru mu var?
+              {t("about.cta.title")}
             </h2>
-            <p
-              className="text-sm leading-relaxed mb-10"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
-              Koleksiyon, ölçü veya teslimat hakkında merak ettikleriniz için
-              doğrudan ulaşın.
+            <p className="text-sm leading-relaxed mb-10" style={{ color: "rgba(255,255,255,0.4)" }}>
+              {t("about.cta.body")}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href="mailto:info@kuzayart.com"
                 className="inline-flex items-center gap-2 px-8 py-3.5 text-xs tracking-[0.25em] uppercase transition-all duration-300 hover:bg-[#c9a96e] hover:border-[#c9a96e] hover:text-black"
-                style={{
-                  border: "1px solid rgba(201,169,110,0.5)",
-                  color: "#c9a96e",
-                }}
+                style={{ border: "1px solid rgba(201,169,110,0.5)", color: "#c9a96e" }}
               >
-                E-posta Gönder
+                {t("about.cta.email")}
               </a>
               <a
                 href="tel:+905332760897"
