@@ -116,7 +116,7 @@ function ProductCard({
           </h3>
 
           <div className="flex items-center gap-3 text-[11px] tracking-[0.15em] uppercase text-black/35">
-            <span>{painting.medium}</span>
+            <span>{painting.medium === "Yağlı Boya" ? t("painting.medium") : painting.medium}</span>
             <span className="w-1 h-1 rounded-full bg-black/20" />
             <span>{painting.dimensions}</span>
             <span className="w-1 h-1 rounded-full bg-black/20" />
@@ -167,6 +167,7 @@ function ProductCard({
 }
 
 export default function ProductGrid() {
+  const { t } = useLang();
   const [soldIds, setSoldIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -190,13 +191,13 @@ export default function ProductGrid() {
         <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <p className="text-xs tracking-[0.35em] uppercase text-white/35 mb-3">
-              Orijinal Eserler
+              {t("collection.subtitle")}
             </p>
             <h2
               className="text-5xl lg:text-6xl font-light text-white leading-tight"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
-              Koleksiyon
+              {t("collection.title")}
             </h2>
           </div>
         </div>

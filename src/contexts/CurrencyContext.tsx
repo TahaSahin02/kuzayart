@@ -33,7 +33,7 @@ const LOCALES: Record<Currency, string> = {
   TRY: "tr-TR",
 };
 
-const FALLBACK_RATES: Rates = { USD: 1.08, TRY: 38.5 };
+const FALLBACK_RATES: Rates = { USD: 1.08, TRY: 55.0 };
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>("EUR");
@@ -46,38 +46,17 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       if (["EUR", "USD", "TRY"].includes(stored)) setCurrencyState(stored);
     } catch {}
 
-    // Primary: open.er-api.com — updates every hour, no key needed
+    // open.er-api.com — hourly updates, no API key needed
     fetch("https://open.er-api.com/v6/latest/EUR")
       .then((r) => r.json())
       .then((data) => {
         if (data?.result === "success" && data?.rates?.USD && data?.rates?.TRY) {
           setRates({ USD: data.rates.USD, TRY: data.rates.TRY });
         } else {
-          // Fallback: Frankfurter (ECB daily)
-          return fetch("https://api.frankfurter.app/latest?from=EUR&to=USD,TRY")
-            .then((r) => r.json())
-            .then((d) => {
-              if (d?.rates?.USD && d?.rates?.TRY) {
-                setRates({ USD: d.rates.USD, TRY: d.rates.TRY });
-              } else {
-                setRates(FALLBACK_RATES);
-              }
-            });
+          setRates(FALLBACK_RATES);
         }
       })
-      .catch(() =>
-        // Last resort: Frankfurter
-        fetch("https://api.frankfurter.app/latest?from=EUR&to=USD,TRY")
-          .then((r) => r.json())
-          .then((d) => {
-            if (d?.rates?.USD && d?.rates?.TRY) {
-              setRates({ USD: d.rates.USD, TRY: d.rates.TRY });
-            } else {
-              setRates(FALLBACK_RATES);
-            }
-          })
-          .catch(() => setRates(FALLBACK_RATES))
-      );
+      .catch(() => setRates(FALLBACK_RATES));
   }, []);
 
   const setCurrency = (c: Currency) => {

@@ -13,6 +13,11 @@ const tr: Record<string, string> = {
   "hero.medium": "Yağlı Boya · Tuval Üzeri",
   "hero.cta": "Koleksiyonu Keşfet",
 
+  // ── Collection section ───────────────────────────────────────
+  "collection.subtitle": "Orijinal Eserler",
+  "collection.title": "Koleksiyon",
+  "painting.medium": "Yağlı Boya",
+
   // ── Product card ─────────────────────────────────────────────
   "product.addToCart": "Sepete Ekle",
   "product.inCart": "Sepette ✓",
@@ -161,6 +166,11 @@ const en: Record<string, string> = {
   // ── Hero Carousel ────────────────────────────────────────────
   "hero.medium": "Oil on Canvas",
   "hero.cta": "Explore Collection",
+
+  // ── Collection section ───────────────────────────────────────
+  "collection.subtitle": "Original Works",
+  "collection.title": "Collection",
+  "painting.medium": "Oil Painting",
 
   // ── Product card ─────────────────────────────────────────────
   "product.addToCart": "Add to Cart",

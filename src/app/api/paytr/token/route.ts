@@ -5,7 +5,7 @@ import { sql } from "@/lib/db";
 import { paintings } from "@/lib/paintings";
 
 async function fetchEurToTry(): Promise<number> {
-  // Primary: open.er-api.com (hourly updates)
+  // open.er-api.com — hourly updates, no API key needed
   try {
     const res = await fetch("https://open.er-api.com/v6/latest/EUR", {
       next: { revalidate: 1800 },
@@ -15,17 +15,7 @@ async function fetchEurToTry(): Promise<number> {
       return data.rates.TRY;
     }
   } catch {}
-  // Fallback: Frankfurter (ECB daily)
-  try {
-    const res = await fetch("https://api.frankfurter.app/latest?from=EUR&to=TRY", {
-      next: { revalidate: 3600 },
-    });
-    const data = await res.json();
-    if (typeof data?.rates?.TRY === "number") {
-      return data.rates.TRY;
-    }
-  } catch {}
-  return 40.0; // hardcoded last-resort fallback
+  return 55.0; // safe hardcoded fallback — never Frankfurter (gives stale ECB rates)
 }
 
 export async function POST(req: NextRequest) {
