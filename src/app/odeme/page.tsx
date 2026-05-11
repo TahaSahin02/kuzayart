@@ -28,10 +28,10 @@ export default function Odeme() {
     setUser(JSON.parse(stored));
   }, [router]);
 
-  // Only redirect to sepet once cart has been hydrated from localStorage
+  // Only redirect to sepet when cart is empty — but NOT once the PayTR iframe is shown
   useEffect(() => {
-    if (hydrated && items.length === 0) router.replace("/sepet");
-  }, [hydrated, items, router]);
+    if (hydrated && items.length === 0 && !iframeToken) router.replace("/sepet");
+  }, [hydrated, items, iframeToken, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +158,6 @@ export default function Odeme() {
                 src={`https://www.paytr.com/odeme/guvenli/${iframeToken}`}
                 style={{ width: "100%", height: "600px", border: "none" }}
                 id="paytr-iframe"
-                onLoad={() => clearCart()}
               />
             </div>
           ) : (

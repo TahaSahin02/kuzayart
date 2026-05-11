@@ -1,11 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { useLang } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 
 export default function OdemeBasarili() {
   const { t } = useLang();
+  const { clearCart } = useCart();
+
+  // Clear cart once when the success page mounts (after payment confirmed)
+  useEffect(() => {
+    clearCart();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
