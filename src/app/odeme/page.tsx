@@ -483,15 +483,15 @@ export default function Odeme() {
                         {t("checkout.approxConversion")}
                       </p>
                       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                          <span style={{ fontSize: "13px", letterSpacing: "0.12em", color: "rgba(255,255,255,0.4)" }}>USD</span>
-                          <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.7rem", fontWeight: 300, color: "rgba(255,255,255,0.7)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "11px", letterSpacing: "0.18em", color: "rgba(255,255,255,0.35)" }}>USD</span>
+                          <span style={{ fontSize: "15px", fontWeight: 300, letterSpacing: "0.04em", color: "rgba(255,255,255,0.65)", fontVariantNumeric: "tabular-nums" }}>
                             {fmtUsd(total * usdRate)}
                           </span>
                         </div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                          <span style={{ fontSize: "13px", letterSpacing: "0.12em", color: "rgba(255,255,255,0.4)" }}>TRY</span>
-                          <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.7rem", fontWeight: 300, color: "#c9a96e" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "11px", letterSpacing: "0.18em", color: "rgba(255,255,255,0.35)" }}>TRY</span>
+                          <span style={{ fontSize: "15px", fontWeight: 400, letterSpacing: "0.04em", color: "#c9a96e", fontVariantNumeric: "tabular-nums" }}>
                             {fmtTry(total * tryRate)}
                           </span>
                         </div>
