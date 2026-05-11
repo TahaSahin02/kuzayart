@@ -2,16 +2,28 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingCartIcon, UserIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useCart } from "@/contexts/CartContext";
 
 export default function Header() {
+  const router = useRouter();
+  const { items } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string } | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("kz_user");
+      if (stored) setUser(JSON.parse(stored));
+    } catch {}
   }, []);
 
   const navLinks = [
@@ -31,7 +43,10 @@ export default function Header() {
         borderBottom: scrolled ? "1px solid rgba(201,169,110,0.12)" : "none",
       }}
     >
-      <div className="max-w-[1400px] mx-auto h-[72px] flex items-center justify-between" style={{ paddingLeft: "48px", paddingRight: "48px" }}>
+      <div
+        className="max-w-[1400px] mx-auto h-[72px] flex items-center justify-between"
+        style={{ paddingLeft: "48px", paddingRight: "48px" }}
+      >
         {/* Logo */}
         <Link href="/" className="flex items-center group">
           <span
@@ -57,25 +72,34 @@ export default function Header() {
         </nav>
 
         {/* Right icons */}
-        <div className="flex items-center gap-4">
-          <button
-            aria-label="Kullanıcı"
+        <div className="flex items-center gap-3">
+          {/* User */}
+          <Link
+            href={user ? "/panel" : "/giris"}
+            aria-label={user ? "Hesabım" : "Giriş Yap"}
             className="w-9 h-9 flex items-center justify-center rounded-full text-[#c8c0b0] hover:text-[#c9a96e] hover:bg-white/5 transition-all duration-300"
+            title={user ? user.name : "Giriş Yap"}
           >
             <UserIcon className="w-5 h-5" />
-          </button>
-          <button
+          </Link>
+
+          {/* Cart */}
+          <Link
+            href="/sepet"
             aria-label="Sepet"
             className="relative w-9 h-9 flex items-center justify-center rounded-full text-[#c8c0b0] hover:text-[#c9a96e] hover:bg-white/5 transition-all duration-300"
           >
             <ShoppingCartIcon className="w-5 h-5" />
-            <span
-              className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[10px] font-medium flex items-center justify-center text-black"
-              style={{ background: "#c9a96e" }}
-            >
-              0
-            </span>
-          </button>
+            {items.length > 0 && (
+              <span
+                className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[10px] font-medium flex items-center justify-center text-black"
+                style={{ background: "#c9a96e" }}
+              >
+                {items.length}
+              </span>
+            )}
+          </Link>
+
           {/* Mobile menu toggle */}
           <button
             className="md:hidden w-9 h-9 flex items-center justify-center text-[#c8c0b0]"
@@ -103,6 +127,21 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          <Link
+            href={user ? "/panel" : "/giris"}
+            onClick={() => setMenuOpen(false)}
+            className="text-sm tracking-[0.2em] uppercase py-1"
+            style={{ color: "#c9a96e" }}
+          >
+            {user ? `Hesabım (${user.name})` : "Giriş Yap"}
+          </Link>
+          <Link
+            href="/sepet"
+            onClick={() => setMenuOpen(false)}
+            className="text-sm tracking-[0.2em] uppercase text-[#c8c0b0] py-1"
+          >
+            Sepet {items.length > 0 && `(${items.length})`}
+          </Link>
         </div>
       )}
     </header>

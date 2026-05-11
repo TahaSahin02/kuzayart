@@ -1,98 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { MagnifyingGlassIcon, ShoppingCartIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import dynamic from "next/dynamic";
+import { paintings, formatPrice } from "@/lib/paintings";
+import { useCart } from "@/contexts/CartContext";
 
 const ZoomModal = dynamic(() => import("./ZoomModal"), { ssr: false });
 
-interface Painting {
-  id: number;
-  src: string;
-  title: string;
-  subtitle: string;
-  medium: string;
-  dimensions: string;
-  year: string;
-  price: number;
-  sold: boolean;
-}
-
-const paintings: Painting[] = [
-  {
-    id: 1,
-    src: "/paintings/tarama1.png",
-    title: "Fırtınanın Eşiğinde",
-    subtitle: "Dramatik yükseltiler ve bulutların muhteşem dansı",
-    medium: "Yağlı Boya",
-    dimensions: "100 × 70 cm",
-    year: "2025",
-    price: 1200,
-    sold: false,
-  },
-  {
-    id: 2,
-    src: "/paintings/tarama2.png",
-    title: "Akdeniz Dalgası",
-    subtitle: "Türkuaz denizin güç ve zarafeti",
-    medium: "Yağlı Boya",
-    dimensions: "120 × 80 cm",
-    year: "2025",
-    price: 1800,
-    sold: false,
-  },
-  {
-    id: 3,
-    src: "/paintings/tarama3.png",
-    title: "Gece Koyu",
-    subtitle: "Ay ışığının koyun karanlık suları üzerindeki sihri",
-    medium: "Yağlı Boya",
-    dimensions: "90 × 70 cm",
-    year: "2025",
-    price: 950,
-    sold: false,
-  },
-  {
-    id: 4,
-    src: "/paintings/tarama4.png",
-    title: "Altın Alacakaranlık",
-    subtitle: "Günbatımının dalgalar üzerindeki sıcak altın ışığı",
-    medium: "Yağlı Boya",
-    dimensions: "80 × 60 cm",
-    year: "2026",
-    price: 750,
-    sold: false,
-  },
-];
-
-function formatPrice(n: number) {
-  return new Intl.NumberFormat("de-DE", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
-
-function ProductCard({ painting }: { painting: Painting }) {
+function ProductCard({
+  painting,
+  soldIds,
+}: {
+  painting: (typeof paintings)[0];
+  soldIds: Set<number>;
+}) {
+  const { addItem, removeItem, hasItem } = useCart();
   const [zoomed, setZoomed] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [added, setAdded] = useState(false);
 
-  const handleAdd = () => {
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+  const isSold = soldIds.has(painting.id);
+  const inCart = hasItem(painting.id);
+
+  const handleCartToggle = () => {
+    if (inCart) {
+      removeItem(painting.id);
+    } else {
+      addItem({
+        id: painting.id,
+        title: painting.title,
+        price: painting.price,
+        src: painting.src,
+        medium: painting.medium,
+        dimensions: painting.dimensions,
+      });
+    }
   };
 
   return (
     <>
       <article
         className="product-card group relative flex flex-col rounded-sm overflow-hidden"
-        style={{
-          background: "#c8c0b0",
-          border: "1px solid rgba(0,0,0,0.1)",
-        }}
+        style={{ background: "#c8c0b0", border: "1px solid rgba(0,0,0,0.1)" }}
       >
         {/* Image */}
         <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/3" }}>
@@ -105,7 +56,7 @@ function ProductCard({ painting }: { painting: Painting }) {
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
 
-          {/* Overlay on hover */}
+          {/* Hover overlay */}
           <div
             className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             style={{ background: "rgba(0,0,0,0.45)" }}
@@ -113,7 +64,11 @@ function ProductCard({ painting }: { painting: Painting }) {
             <button
               onClick={() => setZoomed(true)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs tracking-[0.2em] uppercase font-medium text-white transition-all duration-300 hover:scale-105 active:scale-95"
-              style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.3)",
+              }}
             >
               <MagnifyingGlassIcon className="w-4 h-4" />
               Yakınlaştır
@@ -135,8 +90,11 @@ function ProductCard({ painting }: { painting: Painting }) {
           </button>
 
           {/* Sold badge */}
-          {painting.sold && (
-            <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)" }}>
+          {isSold && (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ background: "rgba(0,0,0,0.6)" }}
+            >
               <span className="px-6 py-2 text-xs tracking-[0.35em] uppercase font-medium text-white border border-white/30">
                 Satıldı
               </span>
@@ -146,14 +104,12 @@ function ProductCard({ painting }: { painting: Painting }) {
 
         {/* Info */}
         <div className="flex flex-col gap-3 p-6">
-          <div>
-            <h3
-              className="text-2xl font-light leading-snug text-black transition-colors duration-300"
-              style={{ fontFamily: "var(--font-cormorant)" }}
-            >
-              {painting.title}
-            </h3>
-          </div>
+          <h3
+            className="text-2xl font-light leading-snug text-black"
+            style={{ fontFamily: "var(--font-cormorant)" }}
+          >
+            {painting.title}
+          </h3>
 
           <div className="flex items-center gap-3 text-[11px] tracking-[0.15em] uppercase text-black/35">
             <span>{painting.medium}</span>
@@ -177,18 +133,18 @@ function ProductCard({ painting }: { painting: Painting }) {
               </p>
             </div>
 
-            {!painting.sold && (
+            {!isSold && (
               <button
-                onClick={handleAdd}
+                onClick={handleCartToggle}
                 className="flex items-center gap-2 px-5 py-3 text-xs tracking-[0.15em] uppercase transition-all duration-300 active:scale-95 rounded-sm"
                 style={{
-                  background: added ? "rgba(0,0,0,0.08)" : "transparent",
-                  border: "1px solid rgba(0,0,0,0.2)",
-                  color: "rgba(0,0,0,0.65)",
+                  background: inCart ? "rgba(0,0,0,0.12)" : "transparent",
+                  border: inCart ? "1px solid rgba(0,0,0,0.4)" : "1px solid rgba(0,0,0,0.2)",
+                  color: inCart ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.65)",
                 }}
               >
                 <ShoppingCartIcon className="w-4 h-4" />
-                {added ? "Eklendi!" : "Sepete Ekle"}
+                {inCart ? "Sepette ✓" : "Sepete Ekle"}
               </button>
             )}
           </div>
@@ -207,10 +163,26 @@ function ProductCard({ painting }: { painting: Painting }) {
 }
 
 export default function ProductGrid() {
+  const [soldIds, setSoldIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    fetch("/api/paintings/sold")
+      .then((r) => r.json())
+      .then((data: { soldIds: number[] }) => setSoldIds(new Set(data.soldIds)))
+      .catch(() => {});
+  }, []);
+
   return (
     <section id="collection" style={{ paddingTop: "96px", paddingBottom: "200px" }}>
-      <div style={{ maxWidth: "1400px", marginLeft: "auto", marginRight: "auto", paddingLeft: "24px", paddingRight: "24px" }}>
-        {/* Section header */}
+      <div
+        style={{
+          maxWidth: "1400px",
+          marginLeft: "auto",
+          marginRight: "auto",
+          paddingLeft: "24px",
+          paddingRight: "24px",
+        }}
+      >
         <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <p className="text-xs tracking-[0.35em] uppercase text-white/35 mb-3">
@@ -225,10 +197,9 @@ export default function ProductGrid() {
           </div>
         </div>
 
-        {/* Grid — 2 per row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {paintings.map((painting) => (
-            <ProductCard key={painting.id} painting={painting} />
+            <ProductCard key={painting.id} painting={painting} soldIds={soldIds} />
           ))}
         </div>
       </div>
