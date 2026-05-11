@@ -24,6 +24,12 @@ const tr: Record<string, string> = {
   "product.sold": "Satıldı",
   "product.price": "Fiyat",
   "product.zoom": "Yakınlaştır",
+  "product.original": "Orijinal",
+  "product.print": "Baskı",
+  "product.originalBadge": "Özgün Tuval",
+  "product.printBadge": "Sanat Baskısı",
+  "product.printNote": "Yüksek çözünürlüklü baskı · Sertifikalı",
+  "product.originalNote": "Tek özgün eser · Sanatçı imzalı",
 
   // ── Cart page ─────────────────────────────────────────────────
   "cart.shopping": "Alışveriş",
@@ -178,6 +184,12 @@ const en: Record<string, string> = {
   "product.sold": "Sold",
   "product.price": "Price",
   "product.zoom": "Zoom",
+  "product.original": "Original",
+  "product.print": "Print",
+  "product.originalBadge": "Original Canvas",
+  "product.printBadge": "Fine Art Print",
+  "product.printNote": "High-resolution print · Certified",
+  "product.originalNote": "Unique original work · Artist signed",
 
   // ── Cart page ─────────────────────────────────────────────────
   "cart.shopping": "Shopping",

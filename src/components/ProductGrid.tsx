@@ -6,7 +6,7 @@ import { MagnifyingGlassIcon, ShoppingCartIcon, HeartIcon } from "@heroicons/rea
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import dynamic from "next/dynamic";
 import { paintings } from "@/lib/paintings";
-import { useCart } from "@/contexts/CartContext";
+import { useCart, ItemType } from "@/contexts/CartContext";
 import { useLang } from "@/contexts/LanguageContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
@@ -22,20 +22,29 @@ function ProductCard({
   const { addItem, removeItem, hasItem } = useCart();
   const { t } = useLang();
   const { format } = useCurrency();
+
   const [zoomed, setZoomed] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [selected, setSelected] = useState<ItemType>("original");
 
-  const isSold = soldIds.has(painting.id);
-  const inCart = hasItem(painting.id);
+  const isOriginalSold = soldIds.has(painting.id);
+  const activePrice = selected === "original" ? painting.price : painting.printPrice;
+  const inCart = hasItem(painting.id, selected);
+
+  // If original gets sold while user has it selected, auto-switch to print
+  useEffect(() => {
+    if (isOriginalSold && selected === "original") setSelected("print");
+  }, [isOriginalSold, selected]);
 
   const handleCartToggle = () => {
     if (inCart) {
-      removeItem(painting.id);
+      removeItem(painting.id, selected);
     } else {
       addItem({
         id: painting.id,
+        type: selected,
         title: painting.title,
-        price: painting.price,
+        price: activePrice,
         src: painting.src,
         medium: painting.medium,
         dimensions: painting.dimensions,
@@ -93,8 +102,8 @@ function ProductCard({
             )}
           </button>
 
-          {/* Sold badge */}
-          {isSold && (
+          {/* Sold badge — only on original tab */}
+          {isOriginalSold && selected === "original" && (
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ background: "rgba(0,0,0,0.6)" }}
@@ -123,21 +132,65 @@ function ProductCard({
             <span>{painting.year}</span>
           </div>
 
+          {/* ── Original / Print toggle ── */}
           <div
-            className="mt-2 pt-4 flex items-center justify-between"
-            style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}
+            className="mt-1 flex gap-0"
+            style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: "14px" }}
           >
+            {(["original", "print"] as ItemType[]).map((type) => {
+              const active = selected === type;
+              const disabled = type === "original" && isOriginalSold;
+              return (
+                <button
+                  key={type}
+                  onClick={() => !disabled && setSelected(type)}
+                  disabled={disabled}
+                  className="flex-1 py-2 text-[11px] tracking-[0.18em] uppercase transition-all duration-200"
+                  style={{
+                    background: active ? "rgba(0,0,0,0.08)" : "transparent",
+                    border: "1px solid",
+                    borderColor: active ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.12)",
+                    color: disabled
+                      ? "rgba(0,0,0,0.2)"
+                      : active
+                      ? "rgba(0,0,0,0.85)"
+                      : "rgba(0,0,0,0.4)",
+                    marginRight: type === "original" ? "-1px" : "0",
+                    position: "relative",
+                    zIndex: active ? 1 : 0,
+                    fontWeight: active ? 500 : 400,
+                    cursor: disabled ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {type === "original" ? t("product.original") : t("product.print")}
+                  {type === "original" && isOriginalSold && (
+                    <span className="ml-1 text-[9px]">✕</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Note line */}
+          <p className="text-[10px] tracking-[0.12em]" style={{ color: "rgba(0,0,0,0.35)" }}>
+            {selected === "original" ? t("product.originalNote") : t("product.printNote")}
+          </p>
+
+          {/* Price + cart */}
+          <div className="flex items-center justify-between mt-1">
             <div>
-              <p className="text-[11px] tracking-[0.2em] uppercase text-black/35 mb-1">{t("product.price")}</p>
+              <p className="text-[11px] tracking-[0.2em] uppercase text-black/35 mb-1">
+                {t("product.price")}
+              </p>
               <p
-                className="text-3xl font-light text-black"
-                style={{ fontFamily: "var(--font-cormorant)" }}
+                className="font-light text-black transition-all duration-200"
+                style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.75rem" }}
               >
-                {format(painting.price)}
+                {format(activePrice)}
               </p>
             </div>
 
-            {!isSold && (
+            {!(selected === "original" && isOriginalSold) && (
               <button
                 onClick={handleCartToggle}
                 className="flex items-center gap-2 px-5 py-3 text-xs tracking-[0.15em] uppercase transition-all duration-300 active:scale-95 rounded-sm"

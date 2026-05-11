@@ -5,7 +5,8 @@ export interface Painting {
   medium: string;
   dimensions: string;
   year: string;
-  price: number; // EUR
+  price: number;      // EUR — original
+  printPrice: number; // EUR — fine art print
 }
 
 export const paintings: Painting[] = [
@@ -17,6 +18,7 @@ export const paintings: Painting[] = [
     dimensions: "100 × 70 cm",
     year: "2025",
     price: 1200,
+    printPrice: 150,
   },
   {
     id: 2,
@@ -26,6 +28,7 @@ export const paintings: Painting[] = [
     dimensions: "120 × 80 cm",
     year: "2025",
     price: 1800,
+    printPrice: 200,
   },
   {
     id: 3,
@@ -35,6 +38,7 @@ export const paintings: Painting[] = [
     dimensions: "90 × 70 cm",
     year: "2025",
     price: 950,
+    printPrice: 120,
   },
   {
     id: 4,
@@ -44,6 +48,7 @@ export const paintings: Painting[] = [
     dimensions: "80 × 60 cm",
     year: "2026",
     price: 750,
+    printPrice: 100,
   },
 ];
 

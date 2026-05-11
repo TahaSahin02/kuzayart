@@ -116,7 +116,7 @@ export default function Sepet() {
                       {format(item.price)}
                     </p>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.id, item.type)}
                       className="flex-shrink-0 w-8 h-8 flex items-center justify-center transition-colors duration-200"
                       style={{ color: "rgba(255,255,255,0.25)" }}
                       aria-label="Kaldır"
