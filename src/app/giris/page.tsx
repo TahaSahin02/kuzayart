@@ -4,11 +4,13 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
+import { useLang } from "@/contexts/LanguageContext";
 
 function GirisContent() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") ?? "/panel";
+  const { t } = useLang();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -58,7 +60,7 @@ function GirisContent() {
             className="text-xs tracking-[0.35em] uppercase mb-3"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            Hesabınıza girin
+            {t("login.subtitle")}
           </p>
           <h1
             className="font-light mb-10"
@@ -68,7 +70,7 @@ function GirisContent() {
               color: "#f0ece4",
             }}
           >
-            Giriş Yap
+            {t("login.title")}
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -77,7 +79,7 @@ function GirisContent() {
                 className="block text-xs tracking-[0.15em] uppercase mb-2"
                 style={{ color: "rgba(255,255,255,0.35)" }}
               >
-                E-posta
+                {t("login.email")}
               </label>
               <input
                 type="email"
@@ -95,7 +97,7 @@ function GirisContent() {
                 className="block text-xs tracking-[0.15em] uppercase mb-2"
                 style={{ color: "rgba(255,255,255,0.35)" }}
               >
-                Şifre
+                {t("login.password")}
               </label>
               <input
                 type="password"
@@ -141,15 +143,15 @@ function GirisContent() {
                   }
                 }}
               >
-                {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+                {loading ? t("login.loading") : t("login.submit")}
               </button>
             </div>
           </form>
 
           <p className="mt-8 text-sm text-center" style={{ color: "rgba(255,255,255,0.35)" }}>
-            Hesabınız yok mu?{" "}
+            {t("login.noAccount")}{" "}
             <Link href="/kayit" style={{ color: "#c9a96e" }}>
-              Kayıt olun
+              {t("login.registerLink")}
             </Link>
           </p>
         </div>

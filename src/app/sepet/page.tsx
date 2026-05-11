@@ -3,13 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
-import { formatPrice } from "@/lib/paintings";
+import { useLang } from "@/contexts/LanguageContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function Sepet() {
   const { items, removeItem, total } = useCart();
+  const { t } = useLang();
+  const { format } = useCurrency();
 
   return (
     <>
@@ -30,7 +33,7 @@ export default function Sepet() {
             className="text-xs tracking-[0.35em] uppercase mb-3"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            Alışveriş
+            {t("cart.shopping")}
           </p>
           <h1
             className="font-light mb-12"
@@ -40,7 +43,7 @@ export default function Sepet() {
               color: "#f0ece4",
             }}
           >
-            Sepetim
+            {t("cart.title")}
           </h1>
 
           {items.length === 0 ? (
@@ -56,19 +59,19 @@ export default function Sepet() {
                   color: "rgba(255,255,255,0.3)",
                 }}
               >
-                Sepetiniz boş.
+                {t("cart.empty")}
               </p>
               <Link
                 href="/#collection"
                 className="text-xs tracking-[0.2em] uppercase"
                 style={{ color: "#c9a96e" }}
               >
-                Koleksiyona göz at →
+                {t("cart.browse")}
               </Link>
             </div>
           ) : (
             <>
-              {/* Ürünler */}
+              {/* Items */}
               <div
                 className="flex flex-col gap-0"
                 style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
@@ -79,10 +82,7 @@ export default function Sepet() {
                     className="flex items-center gap-6 py-6"
                     style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
                   >
-                    <div
-                      className="relative flex-shrink-0"
-                      style={{ width: 80, height: 60 }}
-                    >
+                    <div className="relative flex-shrink-0" style={{ width: 80, height: 60 }}>
                       <Image
                         src={item.src}
                         alt={item.title}
@@ -113,7 +113,7 @@ export default function Sepet() {
                       className="font-light text-xl flex-shrink-0"
                       style={{ fontFamily: "var(--font-cormorant)", color: "#f0ece4" }}
                     >
-                      {formatPrice(item.price)}
+                      {format(item.price)}
                     </p>
                     <button
                       onClick={() => removeItem(item.id)}
@@ -127,14 +127,14 @@ export default function Sepet() {
                 ))}
               </div>
 
-              {/* Toplam + Satın al */}
+              {/* Total + checkout */}
               <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div>
                   <p
                     className="text-xs tracking-[0.2em] uppercase mb-1"
                     style={{ color: "rgba(255,255,255,0.3)" }}
                   >
-                    Toplam
+                    {t("cart.total")}
                   </p>
                   <p
                     className="font-light"
@@ -144,7 +144,7 @@ export default function Sepet() {
                       color: "#f0ece4",
                     }}
                   >
-                    {formatPrice(total)}
+                    {format(total)}
                   </p>
                 </div>
                 <Link
@@ -152,7 +152,7 @@ export default function Sepet() {
                   className="px-10 py-4 text-xs tracking-[0.25em] uppercase transition-all duration-300 hover:opacity-90"
                   style={{ background: "#c9a96e", color: "#0a0a0a", fontWeight: 500 }}
                 >
-                  Satın Al
+                  {t("cart.checkout")}
                 </Link>
               </div>
             </>

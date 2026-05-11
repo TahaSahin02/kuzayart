@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import { useLang } from "@/contexts/LanguageContext";
 
 export default function Kayit() {
   const router = useRouter();
+  const { t } = useLang();
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,6 +45,13 @@ export default function Kayit() {
     outline: "none",
   } as React.CSSProperties;
 
+  const fields = [
+    { key: "name", labelKey: "register.name", type: "text", required: true },
+    { key: "email", labelKey: "register.email", type: "email", required: true },
+    { key: "password", labelKey: "register.password", type: "password", required: true },
+    { key: "phone", labelKey: "register.phone", type: "tel", required: false },
+  ];
+
   return (
     <>
       <Header />
@@ -55,7 +64,7 @@ export default function Kayit() {
             className="text-xs tracking-[0.35em] uppercase mb-3"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            Yeni hesap
+            {t("register.subtitle")}
           </p>
           <h1
             className="font-light mb-10"
@@ -65,22 +74,17 @@ export default function Kayit() {
               color: "#f0ece4",
             }}
           >
-            Kayıt Ol
+            {t("register.title")}
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {[
-              { key: "name", label: "Ad Soyad", type: "text", required: true },
-              { key: "email", label: "E-posta", type: "email", required: true },
-              { key: "password", label: "Şifre", type: "password", required: true },
-              { key: "phone", label: "Telefon (isteğe bağlı)", type: "tel", required: false },
-            ].map(({ key, label, type, required }) => (
+            {fields.map(({ key, labelKey, type, required }) => (
               <div key={key}>
                 <label
                   className="block text-xs tracking-[0.15em] uppercase mb-2"
                   style={{ color: "rgba(255,255,255,0.35)" }}
                 >
-                  {label}
+                  {t(labelKey)}
                 </label>
                 <input
                   type={type}
@@ -131,15 +135,15 @@ export default function Kayit() {
                   }
                 }}
               >
-                {loading ? "Kayıt yapılıyor..." : "Kayıt Ol"}
+                {loading ? t("register.loading") : t("register.submit")}
               </button>
             </div>
           </form>
 
           <p className="mt-8 text-sm text-center" style={{ color: "rgba(255,255,255,0.35)" }}>
-            Zaten hesabınız var mı?{" "}
+            {t("register.hasAccount")}{" "}
             <Link href="/giris" style={{ color: "#c9a96e" }}>
-              Giriş yapın
+              {t("register.loginLink")}
             </Link>
           </p>
         </div>

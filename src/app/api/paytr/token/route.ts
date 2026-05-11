@@ -4,16 +4,35 @@ import { getCurrentUser } from "@/lib/session";
 import { sql } from "@/lib/db";
 import { paintings } from "@/lib/paintings";
 
+async function fetchEurToTry(): Promise<number> {
+  try {
+    const res = await fetch("https://api.frankfurter.app/latest?from=EUR&to=TRY", {
+      next: { revalidate: 300 }, // cache 5 min
+    });
+    const data = await res.json();
+    if (data?.rates?.TRY && typeof data.rates.TRY === "number") {
+      return data.rates.TRY;
+    }
+  } catch {}
+  return 38.5; // fallback rate
+}
+
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ error: "Giriş yapmalısınız." }, { status: 401 });
   }
 
-  const { paintingIds, address, phone } = await req.json() as {
+  const {
+    paintingIds,
+    address,
+    phone,
+    totalTRYKurus, // optional: client can pre-calculate; server always re-validates
+  } = await req.json() as {
     paintingIds: number[];
     address: string;
     phone: string;
+    totalTRYKurus?: number;
   };
 
   const selected = paintings.filter((p) => paintingIds.includes(p.id));
@@ -24,16 +43,32 @@ export async function POST(req: NextRequest) {
   const merchant_id = process.env.PAYTR_MERCHANT_ID!;
   const merchant_key = process.env.PAYTR_MERCHANT_KEY!;
   const merchant_salt = process.env.PAYTR_MERCHANT_SALT!;
-  const base_url = process.env.NEXT_PUBLIC_BASE_URL!;
+  const base_url = process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.kuzayart.com";
 
   const merchant_oid = `KA${Date.now()}`;
-  const totalCents = selected.reduce((s, p) => s + p.price * 100, 0);
-  const currency = "EUR";
+
+  // ── Always fetch live EUR→TRY rate and compute server-side ──
+  const eurToTry = await fetchEurToTry();
+  const totalEUR = selected.reduce((s, p) => s + p.price, 0);
+  const totalTRY = totalEUR * eurToTry;
+  // Use server-computed amount; fall back to client value only if server fetch failed
+  const paymentCents = Math.round(
+    (totalTRYKurus && Math.abs(totalTRYKurus - totalTRY * 100) < totalTRY * 100 * 0.1
+      ? totalTRYKurus // within 10% of server rate → accept
+      : totalTRY * 100)
+  );
+
+  const currency = "TRY";
   const no_installment = "1";
   const max_installment = "0";
   const test_mode = process.env.PAYTR_TEST_MODE ?? "0";
 
-  const basketArr = selected.map((p) => [p.title, p.price.toFixed(2), 1]);
+  // Basket in TRY for display on PayTR page
+  const basketArr = selected.map((p) => [
+    p.title,
+    (p.price * eurToTry).toFixed(2),
+    1,
+  ]);
   const user_basket = Buffer.from(JSON.stringify(basketArr)).toString("base64");
 
   const userIp =
@@ -41,7 +76,7 @@ export async function POST(req: NextRequest) {
     req.headers.get("x-real-ip") ||
     "127.0.0.1";
 
-  const hashStr = `${merchant_id}${userIp}${merchant_oid}${user.email}${totalCents}${user_basket}${no_installment}${max_installment}${currency}${test_mode}`;
+  const hashStr = `${merchant_id}${userIp}${merchant_oid}${user.email}${paymentCents}${user_basket}${no_installment}${max_installment}${currency}${test_mode}`;
   const paytr_token = crypto
     .createHmac("sha256", merchant_key)
     .update(hashStr + merchant_salt)
@@ -52,7 +87,7 @@ export async function POST(req: NextRequest) {
     merchant_key,
     merchant_salt,
     email: user.email,
-    payment_amount: String(totalCents),
+    payment_amount: String(paymentCents),
     merchant_oid,
     user_name: user.name,
     user_address: address,
@@ -71,7 +106,7 @@ export async function POST(req: NextRequest) {
     paytr_token,
   });
 
-  // Siparişi DB'ye kaydet
+  // Save pending order
   await sql`
     INSERT INTO orders (
       user_id, merchant_oid, painting_ids, painting_titles,
@@ -81,7 +116,7 @@ export async function POST(req: NextRequest) {
       ${user.id}, ${merchant_oid},
       ${JSON.stringify(selected.map((p) => p.id))},
       ${selected.map((p) => p.title).join(", ")},
-      ${totalCents}, ${currency}, 'pending',
+      ${paymentCents}, ${currency}, 'pending',
       ${user.name}, ${user.email}, ${phone}, ${address}
     )
     ON CONFLICT (merchant_oid) DO NOTHING

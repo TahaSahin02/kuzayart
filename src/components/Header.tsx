@@ -1,14 +1,132 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ShoppingCartIcon, UserIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/contexts/CartContext";
+import { useLang } from "@/contexts/LanguageContext";
+import { useCurrency, Currency } from "@/contexts/CurrencyContext";
+import type { Lang } from "@/lib/i18n";
 
+/* ─── Mini Dropdown ──────────────────────────────────────────── */
+function Dropdown({
+  trigger,
+  children,
+}: {
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 transition-colors duration-200"
+        style={{
+          color: "rgba(200,192,176,0.85)",
+          fontSize: "11px",
+          letterSpacing: "0.08em",
+          padding: "5px 7px",
+          background: open ? "rgba(255,255,255,0.05)" : "transparent",
+          border: "1px solid",
+          borderColor: open ? "rgba(201,169,110,0.25)" : "rgba(255,255,255,0.08)",
+        }}
+      >
+        {trigger}
+        {/* chevron */}
+        <svg
+          width="8"
+          height="8"
+          viewBox="0 0 10 6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          style={{
+            opacity: 0.5,
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+          }}
+        >
+          <polyline points="1 1 5 5 9 1" />
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          className="absolute right-0 top-full flex flex-col overflow-hidden"
+          style={{
+            marginTop: "6px",
+            background: "rgba(12,12,12,0.97)",
+            border: "1px solid rgba(255,255,255,0.09)",
+            backdropFilter: "blur(20px)",
+            minWidth: "90px",
+            zIndex: 200,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+          }}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DropdownItem({
+  onClick,
+  active,
+  children,
+}: {
+  onClick: () => void;
+  active?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 w-full text-left transition-colors duration-150"
+      style={{
+        padding: "9px 14px",
+        fontSize: "11px",
+        letterSpacing: "0.08em",
+        color: active ? "#c9a96e" : "rgba(200,192,176,0.7)",
+        background: active ? "rgba(201,169,110,0.07)" : "transparent",
+        borderLeft: active ? "2px solid #c9a96e" : "2px solid transparent",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* ─── Language options ───────────────────────────────────────── */
+const LANG_OPTIONS: { value: Lang; flag: string; label: string }[] = [
+  { value: "tr", flag: "🇹🇷", label: "TR" },
+  { value: "en", flag: "🇬🇧", label: "EN" },
+];
+
+/* ─── Currency options ───────────────────────────────────────── */
+const CURRENCY_OPTIONS: { value: Currency; symbol: string; label: string }[] = [
+  { value: "EUR", symbol: "€", label: "EUR" },
+  { value: "USD", symbol: "$", label: "USD" },
+  { value: "TRY", symbol: "₺", label: "TRY" },
+];
+
+/* ─── Header ─────────────────────────────────────────────────── */
 export default function Header() {
-  const router = useRouter();
   const { items } = useCart();
+  const { lang, setLang, t } = useLang();
+  const { currency, setCurrency, rates } = useCurrency();
+
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<{ name: string } | null>(null);
@@ -27,10 +145,13 @@ export default function Header() {
   }, []);
 
   const navLinks = [
-    { label: "Koleksiyon", href: "/#collection" },
-    { label: "Hakkında", href: "/hakkinda" },
-    { label: "İletişim", href: "/iletisim" },
+    { label: t("nav.collection"), href: "/#collection" },
+    { label: t("nav.about"), href: "/hakkinda" },
+    { label: t("nav.contact"), href: "/iletisim" },
   ];
+
+  const currentLang = LANG_OPTIONS.find((l) => l.value === lang)!;
+  const currentCurrency = CURRENCY_OPTIONS.find((c) => c.value === currency)!;
 
   return (
     <header
@@ -71,22 +192,79 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Right icons */}
-        <div className="flex items-center gap-3">
-          {/* User */}
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+
+          {/* ── Language Dropdown ── */}
+          <Dropdown
+            trigger={
+              <span className="flex items-center gap-1.5">
+                <span style={{ fontSize: "15px", lineHeight: 1 }}>{currentLang.flag}</span>
+                <span style={{ fontWeight: 500 }}>{currentLang.label}</span>
+              </span>
+            }
+          >
+            {LANG_OPTIONS.map((opt) => (
+              <DropdownItem
+                key={opt.value}
+                active={lang === opt.value}
+                onClick={() => setLang(opt.value)}
+              >
+                <span style={{ fontSize: "14px" }}>{opt.flag}</span>
+                <span>{opt.label}</span>
+              </DropdownItem>
+            ))}
+          </Dropdown>
+
+          {/* ── Currency Dropdown ── */}
+          <Dropdown
+            trigger={
+              <span className="flex items-center gap-1">
+                <span style={{ color: "#c9a96e", fontWeight: 600 }}>{currentCurrency.symbol}</span>
+                <span style={{ fontWeight: 500 }}>{currentCurrency.label}</span>
+              </span>
+            }
+          >
+            {CURRENCY_OPTIONS.map((opt) => {
+              // Show live rate for non-EUR currencies
+              const rateLabel =
+                rates && opt.value !== "EUR"
+                  ? ` · ${opt.value === "USD" ? rates.USD.toFixed(2) : rates.TRY.toFixed(0)}`
+                  : "";
+              return (
+                <DropdownItem
+                  key={opt.value}
+                  active={currency === opt.value}
+                  onClick={() => setCurrency(opt.value)}
+                >
+                  <span style={{ color: "#c9a96e", fontWeight: 600, minWidth: "14px" }}>
+                    {opt.symbol}
+                  </span>
+                  <span>
+                    {opt.label}
+                    {rateLabel && (
+                      <span style={{ opacity: 0.45, fontSize: "10px" }}>{rateLabel}</span>
+                    )}
+                  </span>
+                </DropdownItem>
+              );
+            })}
+          </Dropdown>
+
+          {/* ── User ── */}
           <Link
             href={user ? "/panel" : "/giris"}
-            aria-label={user ? "Hesabım" : "Giriş Yap"}
+            aria-label={user ? t("nav.account") : t("nav.login")}
             className="w-9 h-9 flex items-center justify-center rounded-full text-[#c8c0b0] hover:text-[#c9a96e] hover:bg-white/5 transition-all duration-300"
-            title={user ? user.name : "Giriş Yap"}
+            title={user ? user.name : t("nav.login")}
           >
             <UserIcon className="w-5 h-5" />
           </Link>
 
-          {/* Cart */}
+          {/* ── Cart ── */}
           <Link
             href="/sepet"
-            aria-label="Sepet"
+            aria-label={t("nav.cart")}
             className="relative w-9 h-9 flex items-center justify-center rounded-full text-[#c8c0b0] hover:text-[#c9a96e] hover:bg-white/5 transition-all duration-300"
           >
             <ShoppingCartIcon className="w-5 h-5" />
@@ -100,7 +278,7 @@ export default function Header() {
             )}
           </Link>
 
-          {/* Mobile menu toggle */}
+          {/* ── Mobile menu toggle ── */}
           <button
             className="md:hidden w-9 h-9 flex items-center justify-center text-[#c8c0b0]"
             onClick={() => setMenuOpen((v) => !v)}
@@ -127,20 +305,55 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+
+          {/* Mobile language + currency row */}
+          <div className="flex items-center gap-3 py-1">
+            {LANG_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setLang(opt.value)}
+                className="flex items-center gap-1.5 text-xs tracking-wider uppercase py-1 px-2 transition-colors"
+                style={{
+                  color: lang === opt.value ? "#c9a96e" : "rgba(200,192,176,0.5)",
+                  border: "1px solid",
+                  borderColor: lang === opt.value ? "rgba(201,169,110,0.3)" : "rgba(255,255,255,0.07)",
+                }}
+              >
+                <span style={{ fontSize: "13px" }}>{opt.flag}</span>
+                {opt.label}
+              </button>
+            ))}
+            <span style={{ color: "rgba(255,255,255,0.1)" }}>|</span>
+            {CURRENCY_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setCurrency(opt.value)}
+                className="text-xs tracking-wider uppercase py-1 px-2 transition-colors"
+                style={{
+                  color: currency === opt.value ? "#c9a96e" : "rgba(200,192,176,0.5)",
+                  border: "1px solid",
+                  borderColor: currency === opt.value ? "rgba(201,169,110,0.3)" : "rgba(255,255,255,0.07)",
+                }}
+              >
+                {opt.symbol} {opt.label}
+              </button>
+            ))}
+          </div>
+
           <Link
             href={user ? "/panel" : "/giris"}
             onClick={() => setMenuOpen(false)}
             className="text-sm tracking-[0.2em] uppercase py-1"
             style={{ color: "#c9a96e" }}
           >
-            {user ? `Hesabım (${user.name})` : "Giriş Yap"}
+            {user ? `${t("nav.account")} (${user.name})` : t("nav.login")}
           </Link>
           <Link
             href="/sepet"
             onClick={() => setMenuOpen(false)}
             className="text-sm tracking-[0.2em] uppercase text-[#c8c0b0] py-1"
           >
-            Sepet {items.length > 0 && `(${items.length})`}
+            {t("nav.cart")} {items.length > 0 && `(${items.length})`}
           </Link>
         </div>
       )}

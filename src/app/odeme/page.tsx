@@ -4,11 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import { useCart } from "@/contexts/CartContext";
-import { formatPrice } from "@/lib/paintings";
+import { useLang } from "@/contexts/LanguageContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 export default function Odeme() {
   const router = useRouter();
   const { items, total, clearCart } = useCart();
+  const { t } = useLang();
+  const { format, toTRY } = useCurrency();
+
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [form, setForm] = useState({ address: "", phone: "" });
   const [iframeToken, setIframeToken] = useState<string | null>(null);
@@ -30,6 +34,9 @@ export default function Odeme() {
     setLoading(true);
     setError("");
 
+    // Convert total EUR → TRY for PayTR (PayTR only accepts TRY)
+    const totalTRYKurus = Math.round(toTRY(total) * 100);
+
     const res = await fetch("/api/paytr/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -37,6 +44,7 @@ export default function Odeme() {
         paintingIds: items.map((i) => i.id),
         address: form.address,
         phone: form.phone,
+        totalTRYKurus,
       }),
     });
 
@@ -82,16 +90,16 @@ export default function Odeme() {
             className="text-xs tracking-[0.35em] uppercase mb-3"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            Ödeme
+            {t("checkout.payment")}
           </p>
           <h1
             className="font-light mb-10"
             style={{ fontFamily: "var(--font-cormorant)", fontSize: "2.8rem", color: "#f0ece4" }}
           >
-            Sipariş Özeti
+            {t("checkout.title")}
           </h1>
 
-          {/* Ürünler */}
+          {/* Items */}
           <div
             className="flex flex-col gap-3 mb-8 pb-8"
             style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
@@ -110,31 +118,37 @@ export default function Odeme() {
                   className="font-light"
                   style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.2rem", color: "#f0ece4" }}
                 >
-                  {formatPrice(item.price)}
+                  {format(item.price)}
                 </p>
               </div>
             ))}
-            <div className="flex justify-between items-center mt-2 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-              <p className="text-xs tracking-[0.2em] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>
-                Toplam
+            <div
+              className="flex justify-between items-center mt-2 pt-4"
+              style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              <p
+                className="text-xs tracking-[0.2em] uppercase"
+                style={{ color: "rgba(255,255,255,0.35)" }}
+              >
+                {t("checkout.total")}
               </p>
               <p
                 className="font-light text-2xl"
                 style={{ fontFamily: "var(--font-cormorant)", color: "#c9a96e" }}
               >
-                {formatPrice(total)}
+                {format(total)}
               </p>
             </div>
           </div>
 
-          {/* PayTR iframe veya form */}
+          {/* PayTR iframe or form */}
           {iframeToken ? (
             <div>
               <p
                 className="text-xs tracking-[0.2em] uppercase mb-4"
                 style={{ color: "rgba(255,255,255,0.3)" }}
               >
-                Güvenli Ödeme
+                {t("checkout.securePay")}
               </p>
               <iframe
                 src={`https://www.paytr.com/odeme/guvenli/${iframeToken}`}
@@ -150,7 +164,7 @@ export default function Odeme() {
                   className="block text-xs tracking-[0.15em] uppercase mb-2"
                   style={{ color: "rgba(255,255,255,0.35)" }}
                 >
-                  Ad Soyad
+                  {t("checkout.name")}
                 </label>
                 <input
                   type="text"
@@ -164,7 +178,7 @@ export default function Odeme() {
                   className="block text-xs tracking-[0.15em] uppercase mb-2"
                   style={{ color: "rgba(255,255,255,0.35)" }}
                 >
-                  E-posta
+                  {t("checkout.email")}
                 </label>
                 <input
                   type="email"
@@ -178,14 +192,14 @@ export default function Odeme() {
                   className="block text-xs tracking-[0.15em] uppercase mb-2"
                   style={{ color: "rgba(255,255,255,0.35)" }}
                 >
-                  Teslimat Adresi
+                  {t("checkout.address")}
                 </label>
                 <textarea
                   required
                   rows={3}
                   value={form.address}
                   onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
-                  placeholder="Tam adresinizi girin..."
+                  placeholder={t("checkout.addressPlaceholder")}
                   style={{ ...inputStyle, resize: "none" }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
                   onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
@@ -196,7 +210,7 @@ export default function Odeme() {
                   className="block text-xs tracking-[0.15em] uppercase mb-2"
                   style={{ color: "rgba(255,255,255,0.35)" }}
                 >
-                  Telefon
+                  {t("checkout.phone")}
                 </label>
                 <input
                   type="tel"
@@ -243,7 +257,7 @@ export default function Odeme() {
                     }
                   }}
                 >
-                  {loading ? "Yükleniyor..." : "Ödemeye Geç"}
+                  {loading ? t("checkout.loading") : t("checkout.proceed")}
                 </button>
               </div>
             </form>

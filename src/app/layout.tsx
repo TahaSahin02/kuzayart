@@ -3,6 +3,8 @@ import { Geist } from "next/font/google";
 import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +34,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${cormorant.variable} antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-[#0a0a0a] text-[#f0ece4]">
-        <CartProvider>{children}</CartProvider>
+        <LanguageProvider>
+          <CurrencyProvider>
+            <CartProvider>{children}</CartProvider>
+          </CurrencyProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

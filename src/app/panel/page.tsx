@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useLang } from "@/contexts/LanguageContext";
 
 interface Order {
   id: number;
@@ -16,14 +17,8 @@ interface Order {
   created_at: string;
 }
 
-const statusLabel: Record<string, { text: string; color: string }> = {
-  pending: { text: "Bekliyor", color: "#c9a96e" },
-  success: { text: "Tamamlandı", color: "#4ade80" },
-  failed: { text: "Başarısız", color: "#f87171" },
-};
-
-function fmt(cents: number, currency: string) {
-  return new Intl.NumberFormat("de-DE", {
+function fmtAmount(cents: number, currency: string) {
+  return new Intl.NumberFormat("tr-TR", {
     style: "currency",
     currency,
     maximumFractionDigits: 0,
@@ -32,9 +27,17 @@ function fmt(cents: number, currency: string) {
 
 export default function Panel() {
   const router = useRouter();
+  const { t, lang } = useLang();
+
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const statusColors: Record<string, string> = {
+    pending: "#c9a96e",
+    success: "#4ade80",
+    failed: "#f87171",
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem("kz_user");
@@ -46,10 +49,15 @@ export default function Panel() {
 
     fetch("/api/user/orders")
       .then((r) => {
-        if (r.status === 401) { router.replace("/giris?next=/panel"); return null; }
+        if (r.status === 401) {
+          router.replace("/giris?next=/panel");
+          return null;
+        }
         return r.json();
       })
-      .then((data) => { if (data) setOrders(data); })
+      .then((data) => {
+        if (data) setOrders(data);
+      })
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -76,7 +84,7 @@ export default function Panel() {
             paddingBottom: "120px",
           }}
         >
-          {/* Başlık */}
+          {/* Header */}
           <div
             className="flex items-start justify-between mb-12 pb-8"
             style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
@@ -86,7 +94,7 @@ export default function Panel() {
                 className="text-xs tracking-[0.35em] uppercase mb-2"
                 style={{ color: "rgba(255,255,255,0.3)" }}
               >
-                Hesabım
+                {t("panel.subtitle")}
               </p>
               <h1
                 className="font-light"
@@ -108,30 +116,33 @@ export default function Panel() {
                 className="text-xs tracking-[0.2em] uppercase px-5 py-3 transition-all duration-300"
                 style={{ border: "1px solid rgba(201,169,110,0.4)", color: "#c9a96e" }}
               >
-                Koleksiyon
+                {t("panel.collection")}
               </Link>
               <button
                 onClick={logout}
                 className="text-xs tracking-[0.2em] uppercase px-5 py-3 transition-all duration-300"
-                style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.4)",
+                }}
               >
-                Çıkış
+                {t("panel.logout")}
               </button>
             </div>
           </div>
 
-          {/* Siparişler */}
+          {/* Orders */}
           <div>
             <p
               className="text-xs tracking-[0.35em] uppercase mb-6"
               style={{ color: "rgba(255,255,255,0.3)" }}
             >
-              Siparişlerim
+              {t("panel.orders")}
             </p>
 
             {loading ? (
               <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
-                Yükleniyor...
+                {t("panel.loading")}
               </p>
             ) : orders.length === 0 ? (
               <div
@@ -146,20 +157,24 @@ export default function Panel() {
                     color: "rgba(255,255,255,0.3)",
                   }}
                 >
-                  Henüz siparişiniz yok.
+                  {t("panel.noOrders")}
                 </p>
                 <Link
                   href="/#collection"
                   className="text-xs tracking-[0.2em] uppercase"
                   style={{ color: "#c9a96e" }}
                 >
-                  Koleksiyona göz at →
+                  {t("panel.browse")}
                 </Link>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
                 {orders.map((order) => {
-                  const s = statusLabel[order.status] ?? { text: order.status, color: "#fff" };
+                  const statusKey = `panel.status.${order.status}`;
+                  const statusText = t(statusKey);
+                  const statusColor = statusColors[order.status] ?? "#fff";
+                  const dateLocale = lang === "en" ? "en-GB" : "tr-TR";
+
                   return (
                     <div
                       key={order.id}
@@ -174,7 +189,7 @@ export default function Panel() {
                           className="text-xs mt-1 tracking-wider"
                           style={{ color: "rgba(255,255,255,0.3)" }}
                         >
-                          {new Date(order.created_at).toLocaleDateString("tr-TR")} ·{" "}
+                          {new Date(order.created_at).toLocaleDateString(dateLocale)} ·{" "}
                           {order.merchant_oid}
                         </p>
                       </div>
@@ -183,17 +198,17 @@ export default function Panel() {
                           className="text-lg font-light"
                           style={{ fontFamily: "var(--font-cormorant)", color: "#f0ece4" }}
                         >
-                          {fmt(order.amount_cents, order.currency)}
+                          {fmtAmount(order.amount_cents, order.currency)}
                         </p>
                         <span
                           className="text-xs tracking-[0.15em] uppercase px-3 py-1"
                           style={{
-                            color: s.color,
-                            border: `1px solid ${s.color}40`,
-                            background: `${s.color}10`,
+                            color: statusColor,
+                            border: `1px solid ${statusColor}40`,
+                            background: `${statusColor}10`,
                           }}
                         >
-                          {s.text}
+                          {statusText}
                         </span>
                       </div>
                     </div>

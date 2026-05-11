@@ -5,8 +5,10 @@ import Image from "next/image";
 import { MagnifyingGlassIcon, ShoppingCartIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import dynamic from "next/dynamic";
-import { paintings, formatPrice } from "@/lib/paintings";
+import { paintings } from "@/lib/paintings";
 import { useCart } from "@/contexts/CartContext";
+import { useLang } from "@/contexts/LanguageContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const ZoomModal = dynamic(() => import("./ZoomModal"), { ssr: false });
 
@@ -18,6 +20,8 @@ function ProductCard({
   soldIds: Set<number>;
 }) {
   const { addItem, removeItem, hasItem } = useCart();
+  const { t } = useLang();
+  const { format } = useCurrency();
   const [zoomed, setZoomed] = useState(false);
   const [liked, setLiked] = useState(false);
 
@@ -71,7 +75,7 @@ function ProductCard({
               }}
             >
               <MagnifyingGlassIcon className="w-4 h-4" />
-              Yakınlaştır
+              {t("product.zoom")}
             </button>
           </div>
 
@@ -96,7 +100,7 @@ function ProductCard({
               style={{ background: "rgba(0,0,0,0.6)" }}
             >
               <span className="px-6 py-2 text-xs tracking-[0.35em] uppercase font-medium text-white border border-white/30">
-                Satıldı
+                {t("product.sold")}
               </span>
             </div>
           )}
@@ -124,12 +128,12 @@ function ProductCard({
             style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}
           >
             <div>
-              <p className="text-[11px] tracking-[0.2em] uppercase text-black/35 mb-1">Fiyat</p>
+              <p className="text-[11px] tracking-[0.2em] uppercase text-black/35 mb-1">{t("product.price")}</p>
               <p
                 className="text-3xl font-light text-black"
                 style={{ fontFamily: "var(--font-cormorant)" }}
               >
-                {formatPrice(painting.price)}
+                {format(painting.price)}
               </p>
             </div>
 
@@ -144,7 +148,7 @@ function ProductCard({
                 }}
               >
                 <ShoppingCartIcon className="w-4 h-4" />
-                {inCart ? "Sepette ✓" : "Sepete Ekle"}
+                {inCart ? t("product.inCart") : t("product.addToCart")}
               </button>
             )}
           </div>
