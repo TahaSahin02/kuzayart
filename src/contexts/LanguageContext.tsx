@@ -21,12 +21,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem("kz_lang") as Lang;
-      if (stored === "tr" || stored === "en") setLangState(stored);
+      if (stored === "tr" || stored === "en") {
+        setLangState(stored);
+        document.documentElement.lang = stored; // sync html lang on mount
+      }
     } catch {}
   }, []);
 
   const setLang = (l: Lang) => {
     setLangState(l);
+    document.documentElement.lang = l; // fixes CSS text-transform uppercase locale
     try {
       localStorage.setItem("kz_lang", l);
     } catch {}
