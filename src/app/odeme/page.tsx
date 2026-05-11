@@ -9,7 +9,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 
 export default function Odeme() {
   const router = useRouter();
-  const { items, total, clearCart } = useCart();
+  const { items, total, clearCart, hydrated } = useCart();
   const { t } = useLang();
   const { format, toTRY } = useCurrency();
 
@@ -26,8 +26,12 @@ export default function Odeme() {
       return;
     }
     setUser(JSON.parse(stored));
-    if (items.length === 0) router.replace("/sepet");
-  }, [router, items]);
+  }, [router]);
+
+  // Only redirect to sepet once cart has been hydrated from localStorage
+  useEffect(() => {
+    if (hydrated && items.length === 0) router.replace("/sepet");
+  }, [hydrated, items, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +109,7 @@ export default function Odeme() {
             style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
           >
             {items.map((item) => (
-              <div key={item.id} className="flex justify-between items-center">
+              <div key={`${item.id}-${item.type}`} className="flex justify-between items-center">
                 <div>
                   <p className="text-sm" style={{ color: "#f0ece4" }}>
                     {item.title}

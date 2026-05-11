@@ -19,6 +19,7 @@ const key = (id: number, type: ItemType) => `${id}-${type}`;
 
 interface CartContextType {
   items: CartItem[];
+  hydrated: boolean;
   addItem: (item: CartItem) => void;
   removeItem: (id: number, type: ItemType) => void;
   clearCart: () => void;
@@ -28,6 +29,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType>({
   items: [],
+  hydrated: false,
   addItem: () => {},
   removeItem: () => {},
   clearCart: () => {},
@@ -37,12 +39,14 @@ const CartContext = createContext<CartContextType>({
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem("kuzayart_cart");
       if (stored) setItems(JSON.parse(stored));
     } catch {}
+    setHydrated(true);
   }, []);
 
   const persist = (next: CartItem[]) => {
@@ -66,7 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const total = items.reduce((s, i) => s + i.price, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, clearCart, hasItem, total }}>
+    <CartContext.Provider value={{ items, hydrated, addItem, removeItem, clearCart, hasItem, total }}>
       {children}
     </CartContext.Provider>
   );
