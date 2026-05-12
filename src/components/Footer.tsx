@@ -42,6 +42,16 @@ export default function Footer() {
                 KuzayArt
               </span>
             </Link>
+            <div style={{ marginTop: "20px" }}>
+              <p className="text-xs tracking-[0.15em] uppercase mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {t("contact.addressLabel")}
+              </p>
+              {t("contact.addressValue").split("\n").map((line, i) => (
+                <p key={i} className="text-sm" style={{ color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
+                  {line}
+                </p>
+              ))}
+            </div>
           </div>
 
           {/* Collection */}

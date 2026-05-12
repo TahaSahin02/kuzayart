@@ -176,6 +176,18 @@ export default function Hakkinda() {
                 +90 533 276 08 97
               </a>
             </div>
+
+            {/* Address */}
+            <div style={{ marginTop: "40px", paddingTop: "32px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+              <p className="text-xs tracking-[0.25em] uppercase mb-3" style={{ color: "rgba(255,255,255,0.25)" }}>
+                {t("contact.addressLabel")}
+              </p>
+              {t("contact.addressValue").split("\n").map((line, i) => (
+                <p key={i} className="text-sm" style={{ color: "rgba(255,255,255,0.4)", lineHeight: 1.9 }}>
+                  {line}
+                </p>
+              ))}
+            </div>
           </div>
         </section>
 
