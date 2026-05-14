@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 
 interface Order {
   id: number;
@@ -28,11 +29,349 @@ interface Customer {
   created_at: string;
 }
 
+interface Painting {
+  id: number;
+  src: string;
+  title: string;
+  medium: string;
+  dimensions: string;
+  year: string;
+  price: number;
+  print_price: number;
+  is_sold: boolean;
+  show_in_hero: boolean;
+  hero_order: number;
+}
+
 const STATUS = {
   pending: { text: "Bekliyor",     color: "#c9a96e" },
   success: { text: "Tamamlandı",   color: "#4ade80" },
   failed:  { text: "Başarısız",    color: "#f87171" },
 };
+
+/* ── Painting Form (add / edit) ── */
+type PaintingFormData = Omit<Painting, "id"> & { id?: number };
+
+function PaintingForm({
+  initial,
+  onSave,
+  onCancel,
+}: {
+  initial?: Painting | null;
+  onSave: (p: Painting) => void;
+  onCancel: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving]       = useState(false);
+  const [preview, setPreview]     = useState<string>(initial?.src ?? "");
+
+  const [form, setForm] = useState<PaintingFormData>({
+    src:          initial?.src          ?? "",
+    title:        initial?.title        ?? "",
+    medium:       initial?.medium       ?? "Yağlı Boya",
+    dimensions:   initial?.dimensions   ?? "",
+    year:         initial?.year         ?? new Date().getFullYear().toString(),
+    price:        initial?.price        ?? 0,
+    print_price:  initial?.print_price  ?? 0,
+    is_sold:      initial?.is_sold      ?? false,
+    show_in_hero: initial?.show_in_hero ?? true,
+    hero_order:   initial?.hero_order   ?? 0,
+  });
+
+  const set = (k: keyof PaintingFormData) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setForm((f) => ({ ...f, [k]: e.target.type === "checkbox" ? (e.target as HTMLInputElement).checked : e.target.value }));
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPreview(URL.createObjectURL(file));
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    const res  = await fetch("/api/admin/upload", { method: "POST", body: fd });
+    const data = await res.json() as { url: string };
+    setForm((f) => ({ ...f, src: data.url }));
+    setUploading(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    const url    = initial?.id ? `/api/admin/paintings/${initial.id}` : "/api/admin/paintings";
+    const method = initial?.id ? "PATCH" : "POST";
+    const res    = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, price: Number(form.price), print_price: Number(form.print_price), hero_order: Number(form.hero_order) }),
+    });
+    const saved = await res.json() as Painting;
+    setSaving(false);
+    onSave(saved);
+  };
+
+  const inp = {
+    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+    color: "#f0ece4", padding: "10px 12px", fontSize: "13px", outline: "none",
+    width: "100%", borderRadius: "2px",
+  } as React.CSSProperties;
+
+  const lbl = { fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.35)", display: "block", marginBottom: "6px" };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
+      <div style={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", padding: "32px", width: "100%", maxWidth: "680px", maxHeight: "90vh", overflowY: "auto", borderRadius: "4px" }}>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+          <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.6rem", fontWeight: 300, color: "#f0ece4" }}>
+            {initial ? "Eseri Düzenle" : "Yeni Eser Ekle"}
+          </h2>
+          <button onClick={onCancel} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "22px", cursor: "pointer" }}>×</button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+
+            {/* Image upload */}
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={lbl}>Görsel *</label>
+              <div
+                onClick={() => fileRef.current?.click()}
+                style={{
+                  border: "2px dashed rgba(255,255,255,0.15)", borderRadius: "4px",
+                  padding: "20px", cursor: "pointer", textAlign: "center",
+                  position: "relative", minHeight: preview ? "200px" : "100px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                {preview ? (
+                  <Image src={preview} alt="preview" fill style={{ objectFit: "contain" }} sizes="600px" unoptimized={preview.startsWith("blob:")} />
+                ) : (
+                  <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px" }}>
+                    {uploading ? "Yükleniyor..." : "Tıkla ve resim seç"}
+                  </p>
+                )}
+                {uploading && (
+                  <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <p style={{ color: "#c9a96e", fontSize: "13px" }}>Yükleniyor...</p>
+                  </div>
+                )}
+              </div>
+              <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} />
+              {form.src && !preview.startsWith("blob:") && (
+                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px", wordBreak: "break-all" }}>{form.src}</p>
+              )}
+            </div>
+
+            {/* Title */}
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={lbl}>Eser Adı *</label>
+              <input required type="text" value={form.title} onChange={set("title")} style={inp}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")} />
+            </div>
+
+            {/* Medium */}
+            <div>
+              <label style={lbl}>Teknik</label>
+              <input type="text" value={form.medium} onChange={set("medium")} style={inp}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")} />
+            </div>
+
+            {/* Year */}
+            <div>
+              <label style={lbl}>Yıl</label>
+              <input type="text" value={form.year} onChange={set("year")} style={inp}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")} />
+            </div>
+
+            {/* Dimensions */}
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={lbl}>Boyut (örn: 100 × 70 cm)</label>
+              <input type="text" value={form.dimensions} onChange={set("dimensions")} style={inp}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")} />
+            </div>
+
+            {/* Price */}
+            <div>
+              <label style={lbl}>Orijinal Fiyat (EUR) *</label>
+              <input required type="number" min="0" value={form.price} onChange={set("price")} style={inp}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")} />
+            </div>
+
+            {/* Print price */}
+            <div>
+              <label style={lbl}>Baskı Fiyatı (EUR)</label>
+              <input type="number" min="0" value={form.print_price} onChange={set("print_price")} style={inp}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")} />
+            </div>
+
+            {/* Hero order */}
+            <div>
+              <label style={lbl}>Hero Sırası</label>
+              <input type="number" min="0" value={form.hero_order} onChange={set("hero_order")} style={inp}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,169,110,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")} />
+            </div>
+
+            {/* Toggles */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", justifyContent: "flex-end" }}>
+              {[
+                { key: "is_sold",      label: "Satıldı" },
+                { key: "show_in_hero", label: "Hero'da Göster" },
+              ].map(({ key, label }) => (
+                <label key={key} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+                  <input type="checkbox" checked={form[key as keyof PaintingFormData] as boolean}
+                    onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.checked }))}
+                    style={{ accentColor: "#c9a96e", width: "16px", height: "16px" }} />
+                  <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>{label}</span>
+                </label>
+              ))}
+            </div>
+
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", marginTop: "28px", justifyContent: "flex-end" }}>
+            <button type="button" onClick={onCancel}
+              style={{ padding: "11px 28px", fontSize: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>
+              İptal
+            </button>
+            <button type="submit" disabled={saving || uploading}
+              style={{ padding: "11px 36px", fontSize: "12px", letterSpacing: "0.2em", background: saving ? "rgba(201,169,110,0.5)" : "#c9a96e", color: "#0a0a0a", fontWeight: 600, border: "none", cursor: saving ? "not-allowed" : "pointer" }}>
+              {saving ? "KAYDEDİLİYOR..." : "KAYDET"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* ── Collection tab ── */
+function CollectionTab() {
+  const [paintings, setPaintings] = useState<Painting[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [editing, setEditing]     = useState<Painting | null | "new">(null);
+  const [deleting, setDeleting]   = useState<number | null>(null);
+
+  const load = () => {
+    fetch("/api/admin/paintings")
+      .then((r) => r.json())
+      .then((d: Painting[]) => { setPaintings(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleSave = (p: Painting) => {
+    setPaintings((prev) => {
+      const idx = prev.findIndex((x) => x.id === p.id);
+      return idx >= 0 ? prev.map((x) => (x.id === p.id ? p : x)) : [...prev, p];
+    });
+    setEditing(null);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Bu eseri silmek istediğinizden emin misiniz?")) return;
+    setDeleting(id);
+    await fetch(`/api/admin/paintings/${id}`, { method: "DELETE" });
+    setPaintings((prev) => prev.filter((p) => p.id !== id));
+    setDeleting(null);
+  };
+
+  const toggleField = async (p: Painting, field: "is_sold" | "show_in_hero") => {
+    const updated = { ...p, [field]: !p[field] };
+    setPaintings((prev) => prev.map((x) => (x.id === p.id ? updated : x)));
+    await fetch(`/api/admin/paintings/${p.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [field]: !p[field] }),
+    });
+  };
+
+  if (loading) return <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px" }}>Yükleniyor...</p>;
+
+  return (
+    <>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>{paintings.length} eser</p>
+        <button onClick={() => setEditing("new")}
+          style={{ padding: "10px 24px", fontSize: "12px", letterSpacing: "0.2em", background: "#c9a96e", color: "#0a0a0a", fontWeight: 600, border: "none", cursor: "pointer" }}>
+          + YENİ ESER EKLE
+        </button>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }}>
+        {paintings.map((p) => (
+          <div key={p.id} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "2px", overflow: "hidden", background: "rgba(255,255,255,0.02)" }}>
+
+            {/* Image */}
+            <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", background: "#1a1a1a" }}>
+              <Image src={p.src} alt={p.title} fill style={{ objectFit: "cover" }} sizes="300px" unoptimized={p.src.startsWith("http")} />
+              {p.is_sold && (
+                <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: "11px", letterSpacing: "0.3em", color: "white", border: "1px solid rgba(255,255,255,0.4)", padding: "4px 14px" }}>SATILDI</span>
+                </div>
+              )}
+            </div>
+
+            {/* Info */}
+            <div style={{ padding: "14px 16px" }}>
+              <p style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.15rem", fontWeight: 300, color: "#f0ece4", marginBottom: "4px" }}>{p.title}</p>
+              <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", marginBottom: "10px" }}>
+                {p.medium} · {p.dimensions} · {p.year}
+              </p>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
+                <span style={{ fontSize: "12px", color: "#c9a96e" }}>€{p.price}</span>
+                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>Baskı €{p.print_price}</span>
+              </div>
+
+              {/* Toggles */}
+              <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                <button onClick={() => toggleField(p, "is_sold")}
+                  style={{ flex: 1, padding: "6px 8px", fontSize: "10px", letterSpacing: "0.1em", cursor: "pointer", border: "1px solid", borderColor: p.is_sold ? "#f87171" : "rgba(255,255,255,0.15)", background: p.is_sold ? "rgba(248,113,113,0.12)" : "transparent", color: p.is_sold ? "#f87171" : "rgba(255,255,255,0.4)" }}>
+                  {p.is_sold ? "✓ SATILDI" : "SATILDI"}
+                </button>
+                <button onClick={() => toggleField(p, "show_in_hero")}
+                  style={{ flex: 1, padding: "6px 8px", fontSize: "10px", letterSpacing: "0.1em", cursor: "pointer", border: "1px solid", borderColor: p.show_in_hero ? "#c9a96e" : "rgba(255,255,255,0.15)", background: p.show_in_hero ? "rgba(201,169,110,0.12)" : "transparent", color: p.show_in_hero ? "#c9a96e" : "rgba(255,255,255,0.4)" }}>
+                  {p.show_in_hero ? "✓ HERO" : "HERO"}
+                </button>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => setEditing(p)}
+                  style={{ flex: 1, padding: "8px", fontSize: "11px", letterSpacing: "0.1em", cursor: "pointer", background: "transparent", border: "1px solid rgba(201,169,110,0.4)", color: "#c9a96e" }}>
+                  DÜZENLE
+                </button>
+                <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id}
+                  style={{ padding: "8px 14px", fontSize: "11px", cursor: "pointer", background: "transparent", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171" }}>
+                  SİL
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {editing !== null && (
+        <PaintingForm
+          initial={editing === "new" ? null : editing}
+          onSave={handleSave}
+          onCancel={() => setEditing(null)}
+        />
+      )}
+    </>
+  );
+}
 
 function fmt(cents: number, currency: string) {
   return new Intl.NumberFormat("de-DE", {
@@ -164,7 +503,7 @@ export default function Admin() {
   const [loginError, setLoginError] = useState("");
   const [loading, setLoading] = useState(true);
   const [data, setData]       = useState<{ orders: Order[]; customers: Customer[]; totalRevenueCents: number } | null>(null);
-  const [tab, setTab]         = useState<"orders" | "customers">("orders");
+  const [tab, setTab]         = useState<"orders" | "customers" | "collection">("orders");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const fetchData = async () => {
@@ -257,20 +596,26 @@ export default function Admin() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: "6px", marginBottom: "20px" }}>
-          {(["orders", "customers"] as const).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
+        <div style={{ display: "flex", gap: "6px", marginBottom: "20px", flexWrap: "wrap" }}>
+          {([
+            { key: "collection", label: "KOLEKSİYON" },
+            { key: "orders",     label: `SİPARİŞLER (${data!.orders.length})` },
+            { key: "customers",  label: `MÜŞTERİLER (${data!.customers.length})` },
+          ] as const).map(({ key, label }) => (
+            <button key={key} onClick={() => setTab(key)}
               style={{
                 padding: "8px 20px", fontSize: "11px", letterSpacing: "0.15em",
-                background: tab === t ? "rgba(201,169,110,0.12)" : "transparent",
-                border: `1px solid ${tab === t ? "rgba(201,169,110,0.4)" : "rgba(255,255,255,0.08)"}`,
-                color: tab === t ? "#c9a96e" : "rgba(255,255,255,0.4)", cursor: "pointer",
+                background: tab === key ? "rgba(201,169,110,0.12)" : "transparent",
+                border: `1px solid ${tab === key ? "rgba(201,169,110,0.4)" : "rgba(255,255,255,0.08)"}`,
+                color: tab === key ? "#c9a96e" : "rgba(255,255,255,0.4)", cursor: "pointer",
               }}
             >
-              {t === "orders" ? `SİPARİŞLER (${data!.orders.length})` : `MÜŞTERİLER (${data!.customers.length})`}
+              {label}
             </button>
           ))}
         </div>
+
+        {tab === "collection" && <CollectionTab />}
 
         {tab === "orders" && (
           <>

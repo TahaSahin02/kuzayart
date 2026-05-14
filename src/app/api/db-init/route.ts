@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 
 export async function GET() {
+  // Users
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -14,6 +15,38 @@ export async function GET() {
     )
   `;
 
+  // Paintings (CMS managed)
+  await sql`
+    CREATE TABLE IF NOT EXISTS paintings (
+      id SERIAL PRIMARY KEY,
+      src TEXT NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      medium VARCHAR(100) NOT NULL DEFAULT 'Yağlı Boya',
+      dimensions VARCHAR(100) NOT NULL DEFAULT '',
+      year VARCHAR(10) NOT NULL DEFAULT '',
+      price INTEGER NOT NULL DEFAULT 0,
+      print_price INTEGER NOT NULL DEFAULT 0,
+      is_sold BOOLEAN NOT NULL DEFAULT FALSE,
+      show_in_hero BOOLEAN NOT NULL DEFAULT TRUE,
+      hero_order INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )
+  `;
+
+  // Seed existing 4 paintings (won't duplicate)
+  await sql`
+    INSERT INTO paintings (id, src, title, medium, dimensions, year, price, print_price, is_sold, show_in_hero, hero_order)
+    VALUES
+      (1, '/paintings/tarama1.png', 'Fırtınanın Eşiğinde', 'Yağlı Boya', '100 × 70 cm', '2025', 1200, 150, false, true, 0),
+      (2, '/paintings/tarama2.png', 'Akdeniz Dalgası',     'Yağlı Boya', '120 × 80 cm', '2025', 1800, 200, false, true, 1),
+      (3, '/paintings/tarama3.png', 'Gece Koyu',           'Yağlı Boya', '90 × 70 cm',  '2025',  950, 120, false, true, 2),
+      (4, '/paintings/tarama4.png', 'Altın Alacakaranlık', 'Yağlı Boya', '80 × 60 cm',  '2026',  750, 100, false, true, 3)
+    ON CONFLICT (id) DO NOTHING
+  `;
+  // Advance sequence past seeded rows
+  await sql`SELECT setval('paintings_id_seq', GREATEST((SELECT MAX(id) FROM paintings), 4))`;
+
+  // Orders
   await sql`
     CREATE TABLE IF NOT EXISTS orders (
       id SERIAL PRIMARY KEY,
@@ -36,8 +69,6 @@ export async function GET() {
       updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
   `;
-
-  /* Add new columns to existing tables without losing data */
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS amount_eur_cents INTEGER`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_city VARCHAR(100)`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_postal_code VARCHAR(20)`;

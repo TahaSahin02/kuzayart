@@ -5,19 +5,34 @@ import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useLang } from "@/contexts/LanguageContext";
 
-// titles are the same in both languages (painting names)
-const slides = [
+interface HeroSlide { src: string; title: string; year: string; }
+
+const FALLBACK: HeroSlide[] = [
   { src: "/paintings/tarama1.png", title: "Fırtınanın Eşiğinde", year: "2025" },
-  { src: "/paintings/tarama2.png", title: "Akdeniz Dalgası",       year: "2025" },
-  { src: "/paintings/tarama3.png", title: "Gece Koyu",              year: "2025" },
-  { src: "/paintings/tarama4.png", title: "Altın Alacakaranlık",    year: "2026" },
+  { src: "/paintings/tarama2.png", title: "Akdeniz Dalgası",      year: "2025" },
+  { src: "/paintings/tarama3.png", title: "Gece Koyu",             year: "2025" },
+  { src: "/paintings/tarama4.png", title: "Altın Alacakaranlık",   year: "2026" },
 ];
 
 const INTERVAL = 5000;
 
 export default function HeroCarousel() {
   const { t } = useLang();
+  const [slides, setSlides] = useState<HeroSlide[]>(FALLBACK);
   const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/paintings")
+      .then((r) => r.json())
+      .then((data: { src: string; title: string; year: string; show_in_hero: boolean; hero_order: number }[]) => {
+        const hero = data
+          .filter((p) => p.show_in_hero)
+          .sort((a, b) => a.hero_order - b.hero_order)
+          .map((p) => ({ src: p.src, title: p.title, year: p.year }));
+        if (hero.length > 0) setSlides(hero);
+      })
+      .catch(() => {});
+  }, []);
   const [prev, setPrev] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -39,8 +54,8 @@ export default function HeroCarousel() {
     [current, transitioning]
   );
 
-  const next = useCallback(() => goTo((current + 1) % slides.length), [current, goTo]);
-  const back = useCallback(() => goTo((current - 1 + slides.length) % slides.length), [current, goTo]);
+  const next = useCallback(() => goTo((current + 1) % slides.length), [current, goTo, slides.length]);
+  const back = useCallback(() => goTo((current - 1 + slides.length) % slides.length), [current, goTo, slides.length]);
 
   useEffect(() => {
     if (paused) return;

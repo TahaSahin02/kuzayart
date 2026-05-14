@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getCurrentUser } from "@/lib/session";
 import { sql } from "@/lib/db";
-import { paintings } from "@/lib/paintings";
 
 async function fetchEurToTry(): Promise<number> {
   try {
@@ -45,11 +44,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Geçersiz ürün." }, { status: 400 });
   }
 
-  // Resolve each item to its correct EUR price from our database
+  // Resolve from DB
+  const ids = items.map((i) => i.id);
+  const dbRows = await sql`SELECT id, title, price, print_price FROM paintings WHERE id = ANY(${ids})`;
+  const paintingMap = new Map(dbRows.map((r) => [Number(r.id), r]));
+
   const resolvedItems = items.flatMap(({ id, type }) => {
-    const p = paintings.find((x) => x.id === id);
+    const p = paintingMap.get(id);
     if (!p) return [];
-    return [{ painting: p, type, priceEur: type === "original" ? p.price : p.printPrice }];
+    const priceEur = type === "original" ? Number(p.price) : Number(p.print_price);
+    return [{ painting: p, type, priceEur }];
   });
 
   if (resolvedItems.length === 0) {

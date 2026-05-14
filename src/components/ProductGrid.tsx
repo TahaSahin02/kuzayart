@@ -5,10 +5,23 @@ import Image from "next/image";
 import { MagnifyingGlassIcon, ShoppingCartIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import dynamic from "next/dynamic";
-import { paintings } from "@/lib/paintings";
 import { useCart, ItemType } from "@/contexts/CartContext";
 import { useLang } from "@/contexts/LanguageContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
+
+interface Painting {
+  id: number;
+  src: string;
+  title: string;
+  medium: string;
+  dimensions: string;
+  year: string;
+  price: number;
+  print_price: number;
+  is_sold: boolean;
+  show_in_hero: boolean;
+  hero_order: number;
+}
 
 const ZoomModal = dynamic(() => import("./ZoomModal"), { ssr: false });
 
@@ -16,7 +29,7 @@ function ProductCard({
   painting,
   soldIds,
 }: {
-  painting: (typeof paintings)[0];
+  painting: Painting;
   soldIds: Set<number>;
 }) {
   const { addItem, removeItem, hasItem } = useCart();
@@ -28,7 +41,7 @@ function ProductCard({
   const [selected, setSelected] = useState<ItemType>("original");
 
   const isOriginalSold = soldIds.has(painting.id);
-  const activePrice = selected === "original" ? painting.price : painting.printPrice;
+  const activePrice = selected === "original" ? painting.price : painting.print_price;
   const inCart = hasItem(painting.id, selected);
 
   // If original gets sold while user has it selected, auto-switch to print
@@ -238,9 +251,14 @@ function ProductCard({
 
 export default function ProductGrid() {
   const { t } = useLang();
-  const [soldIds, setSoldIds] = useState<Set<number>>(new Set());
+  const [paintings, setPaintings] = useState<Painting[]>([]);
+  const [soldIds, setSoldIds]     = useState<Set<number>>(new Set());
 
   useEffect(() => {
+    fetch("/api/paintings")
+      .then((r) => r.json())
+      .then((data: Painting[]) => setPaintings(data))
+      .catch(() => {});
     fetch("/api/paintings/sold")
       .then((r) => r.json())
       .then((data: { soldIds: number[] }) => setSoldIds(new Set(data.soldIds)))
