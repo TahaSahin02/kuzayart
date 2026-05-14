@@ -6,24 +6,30 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const body = await req.json();
+  const numId  = Number(id);
+  const body   = await req.json() as Record<string, unknown>;
 
-  const rows = await sql`
-    UPDATE paintings SET
-      src         = COALESCE(${body.src         ?? null}, src),
-      title       = COALESCE(${body.title       ?? null}, title),
-      medium      = COALESCE(${body.medium      ?? null}, medium),
-      dimensions  = COALESCE(${body.dimensions  ?? null}, dimensions),
-      year        = COALESCE(${body.year        ?? null}, year),
-      price       = COALESCE(${body.price       !== undefined ? Number(body.price)       : null}, price),
-      print_price = COALESCE(${body.print_price !== undefined ? Number(body.print_price) : null}, print_price),
-      is_sold     = COALESCE(${body.is_sold     !== undefined ? body.is_sold     : null}, is_sold),
-      show_in_hero = COALESCE(${body.show_in_hero !== undefined ? body.show_in_hero : null}, show_in_hero),
-      hero_order  = COALESCE(${body.hero_order  !== undefined ? Number(body.hero_order) : null}, hero_order)
-    WHERE id = ${Number(id)}
-    RETURNING *
-  `;
+  // Apply each provided field as a separate UPDATE to avoid COALESCE boolean issues
+  if (body.src         !== undefined) await sql`UPDATE paintings SET src         = ${String(body.src)}          WHERE id = ${numId}`;
+  if (body.title       !== undefined) await sql`UPDATE paintings SET title       = ${String(body.title)}        WHERE id = ${numId}`;
+  if (body.medium      !== undefined) await sql`UPDATE paintings SET medium      = ${String(body.medium)}       WHERE id = ${numId}`;
+  if (body.dimensions  !== undefined) await sql`UPDATE paintings SET dimensions  = ${String(body.dimensions)}   WHERE id = ${numId}`;
+  if (body.year        !== undefined) await sql`UPDATE paintings SET year        = ${String(body.year)}         WHERE id = ${numId}`;
+  if (body.price       !== undefined) await sql`UPDATE paintings SET price       = ${Number(body.price)}        WHERE id = ${numId}`;
+  if (body.print_price !== undefined) await sql`UPDATE paintings SET print_price = ${Number(body.print_price)}  WHERE id = ${numId}`;
+  if (body.hero_order  !== undefined) await sql`UPDATE paintings SET hero_order  = ${Number(body.hero_order)}   WHERE id = ${numId}`;
 
+  // Booleans as separate casts to avoid COALESCE(false) → null ambiguity
+  if (body.is_sold      !== undefined) {
+    const val = body.is_sold === true || body.is_sold === "true";
+    await sql`UPDATE paintings SET is_sold      = ${val} WHERE id = ${numId}`;
+  }
+  if (body.show_in_hero !== undefined) {
+    const val = body.show_in_hero === true || body.show_in_hero === "true";
+    await sql`UPDATE paintings SET show_in_hero = ${val} WHERE id = ${numId}`;
+  }
+
+  const rows = await sql`SELECT * FROM paintings WHERE id = ${numId}`;
   if (rows.length === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(rows[0]);
 }
