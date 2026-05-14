@@ -7,6 +7,12 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Run migration silently so new columns exist before querying
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS amount_eur_cents INTEGER`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_city VARCHAR(100)`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_postal_code VARCHAR(20)`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_country VARCHAR(100)`;
+
   const orders = await sql`
     SELECT
       o.id, o.merchant_oid, o.painting_titles,

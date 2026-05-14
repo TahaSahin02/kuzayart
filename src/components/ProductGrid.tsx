@@ -102,7 +102,7 @@ function ProductCard({
             )}
           </button>
 
-          {/* Sold badge — only on original tab */}
+          {/* Full overlay when original tab selected and sold */}
           {isOriginalSold && selected === "original" && (
             <div
               className="absolute inset-0 flex items-center justify-center"
@@ -110,6 +110,23 @@ function ProductCard({
             >
               <span className="px-6 py-2 text-xs tracking-[0.35em] uppercase font-medium text-white border border-white/30">
                 {t("product.sold")}
+              </span>
+            </div>
+          )}
+
+          {/* Small persistent badge when print tab selected but original is sold */}
+          {isOriginalSold && selected !== "original" && (
+            <div className="absolute top-3 left-3">
+              <span
+                className="px-2.5 py-1 text-[10px] tracking-[0.15em] uppercase"
+                style={{
+                  background: "rgba(0,0,0,0.72)",
+                  color: "rgba(255,255,255,0.65)",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  backdropFilter: "blur(6px)",
+                }}
+              >
+                {t("product.originalSold")}
               </span>
             </div>
           )}

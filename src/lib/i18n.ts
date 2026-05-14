@@ -30,6 +30,7 @@ const tr: Record<string, string> = {
   "product.printBadge": "Sanat Baskısı",
   "product.printNote": "Yüksek çözünürlüklü baskı · Sertifikalı",
   "product.originalNote": "Tek özgün eser · Sanatçı imzalı",
+  "product.originalSold": "Orijinal Satıldı",
 
   // ── Cart page ─────────────────────────────────────────────────
   "cart.shopping": "Alışveriş",
@@ -58,7 +59,7 @@ const tr: Record<string, string> = {
   "checkout.city": "Şehir",
   "checkout.postal": "Posta Kodu",
   "checkout.shipping": "Kargo",
-  "checkout.shippingNote": "Ayrıca iletişime geçilecek",
+  "checkout.shippingNote": "Sipariş sonrası sizinle iletişime geçilecek",
   "checkout.approxConversion": "Yaklaşık dönüşüm",
   "checkout.paytrTryNote": "PayTR üzerinden ödeme TL cinsinden tahsil edilir.",
   "checkout.terms1": "",
@@ -207,6 +208,7 @@ const en: Record<string, string> = {
   "product.printBadge": "Fine Art Print",
   "product.printNote": "High-resolution print · Certified",
   "product.originalNote": "Unique original work · Artist signed",
+  "product.originalSold": "Original Sold",
 
   // ── Cart page ─────────────────────────────────────────────────
   "cart.shopping": "Shopping",
@@ -235,7 +237,7 @@ const en: Record<string, string> = {
   "checkout.city": "City",
   "checkout.postal": "Postal Code",
   "checkout.shipping": "Shipping",
-  "checkout.shippingNote": "Quoted separately",
+  "checkout.shippingNote": "We'll contact you after order",
   "checkout.approxConversion": "Approximate conversion",
   "checkout.paytrTryNote": "Payment is processed in TRY via PayTR.",
   "checkout.terms1": "I have read and accept the",
