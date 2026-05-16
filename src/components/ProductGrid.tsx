@@ -40,7 +40,7 @@ function ProductCard({
   const [liked, setLiked] = useState(false);
   const [selected, setSelected] = useState<ItemType>("original");
 
-  const isOriginalSold = soldIds.has(painting.id);
+  const isOriginalSold = painting.is_sold || soldIds.has(painting.id);
   const activePrice = selected === "original" ? painting.price : painting.print_price;
   const inCart = hasItem(painting.id, selected);
 
