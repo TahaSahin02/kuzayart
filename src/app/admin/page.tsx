@@ -288,13 +288,26 @@ function CollectionTab() {
   };
 
   const toggleField = async (p: Painting, field: "is_sold" | "show_in_hero") => {
-    const updated = { ...p, [field]: !p[field] };
-    setPaintings((prev) => prev.map((x) => (x.id === p.id ? updated : x)));
-    await fetch(`/api/admin/paintings/${p.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [field]: !p[field] }),
-    });
+    const newVal = !p[field];
+    // Optimistic update
+    setPaintings((prev) => prev.map((x) => (x.id === p.id ? { ...x, [field]: newVal } : x)));
+    try {
+      const res = await fetch(`/api/admin/paintings/${p.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: newVal }),
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Replace with the DB's authoritative copy
+      const saved = (await res.json()) as Painting;
+      setPaintings((prev) => prev.map((x) => (x.id === p.id ? saved : x)));
+    } catch (err) {
+      console.error("Update failed:", err);
+      // Revert
+      setPaintings((prev) => prev.map((x) => (x.id === p.id ? p : x)));
+      alert("Güncelleme başarısız oldu. Tekrar deneyin.");
+    }
   };
 
   if (loading) return <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px" }}>Yükleniyor...</p>;

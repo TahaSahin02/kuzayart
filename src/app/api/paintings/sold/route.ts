@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 
+// Kept for backwards compatibility, but truth lives in paintings.is_sold (admin-controlled).
+// Orders no longer auto-flip is_sold — only the admin SATIŞTA/SATILDI toggle does.
+export const dynamic  = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   try {
-    // Sold = admin marked as sold OR successfully ordered
-    const marked  = await sql`SELECT id FROM paintings WHERE is_sold = true`;
-    const ordered = await sql`SELECT painting_ids FROM orders WHERE status = 'success'`;
-
-    const soldIds = new Set<number>(marked.map((r) => Number(r.id)));
-    for (const row of ordered) {
-      try {
-        (JSON.parse(row.painting_ids as string) as number[]).forEach((id) => soldIds.add(id));
-      } catch {}
-    }
-    return NextResponse.json({ soldIds: Array.from(soldIds) });
+    const rows = await sql`SELECT id FROM paintings WHERE is_sold = TRUE`;
+    return NextResponse.json(
+      { soldIds: rows.map((r) => Number(r.id)) },
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
   } catch {
-    return NextResponse.json({ soldIds: [] });
+    return NextResponse.json({ soldIds: [] }, { headers: { "Cache-Control": "no-store, max-age=0" } });
   }
 }

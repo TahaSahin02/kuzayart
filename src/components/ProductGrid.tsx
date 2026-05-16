@@ -25,29 +25,25 @@ interface Painting {
 
 const ZoomModal = dynamic(() => import("./ZoomModal"), { ssr: false });
 
-function ProductCard({
-  painting,
-  soldIds,
-}: {
-  painting: Painting;
-  soldIds: Set<number>;
-}) {
+/* ── Single product card ── */
+function ProductCard({ painting }: { painting: Painting }) {
   const { addItem, removeItem, hasItem } = useCart();
   const { t } = useLang();
   const { format } = useCurrency();
 
-  const [zoomed, setZoomed] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [selected, setSelected] = useState<ItemType>("original");
+  const [zoomed, setZoomed]     = useState(false);
+  const [liked, setLiked]       = useState(false);
+  const [selected, setSelected] = useState<ItemType>(painting.is_sold ? "print" : "original");
 
-  const isOriginalSold = painting.is_sold || soldIds.has(painting.id);
+  // The ONLY source of truth: admin-set is_sold flag
+  const isSold     = painting.is_sold;
   const activePrice = selected === "original" ? painting.price : painting.print_price;
-  const inCart = hasItem(painting.id, selected);
+  const inCart      = hasItem(painting.id, selected);
 
-  // If original gets sold while user has it selected, auto-switch to print
+  // If admin marks original as sold while user has it selected, auto-switch to print
   useEffect(() => {
-    if (isOriginalSold && selected === "original") setSelected("print");
-  }, [isOriginalSold, selected]);
+    if (isSold && selected === "original") setSelected("print");
+  }, [isSold, selected]);
 
   const handleCartToggle = () => {
     if (inCart) {
@@ -80,9 +76,10 @@ function ProductCard({
             quality={100}
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105"
+            unoptimized={painting.src.startsWith("http")}
           />
 
-          {/* Hover overlay */}
+          {/* Hover overlay (zoom) */}
           <div
             className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             style={{ background: "rgba(0,0,0,0.45)" }}
@@ -115,8 +112,8 @@ function ProductCard({
             )}
           </button>
 
-          {/* Full overlay when original tab selected and sold */}
-          {isOriginalSold && selected === "original" && (
+          {/* Full overlay when original is sold AND selected */}
+          {isSold && selected === "original" && (
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ background: "rgba(0,0,0,0.6)" }}
@@ -127,8 +124,8 @@ function ProductCard({
             </div>
           )}
 
-          {/* Small persistent badge when print tab selected but original is sold */}
-          {isOriginalSold && selected !== "original" && (
+          {/* Small persistent badge — original sold but viewing print */}
+          {isSold && selected !== "original" && (
             <div className="absolute top-3 left-3">
               <span
                 className="px-2.5 py-1 text-[10px] tracking-[0.15em] uppercase"
@@ -162,14 +159,14 @@ function ProductCard({
             <span>{painting.year}</span>
           </div>
 
-          {/* ── Original / Print toggle ── */}
+          {/* Original / Print toggle */}
           <div
             className="mt-1 flex gap-0"
             style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: "14px" }}
           >
             {(["original", "print"] as ItemType[]).map((type) => {
-              const active = selected === type;
-              const disabled = type === "original" && isOriginalSold;
+              const active   = selected === type;
+              const disabled = type === "original" && isSold;
               return (
                 <button
                   key={type}
@@ -193,15 +190,13 @@ function ProductCard({
                   }}
                 >
                   {type === "original" ? t("product.original") : t("product.print")}
-                  {type === "original" && isOriginalSold && (
-                    <span className="ml-1 text-[9px]">✕</span>
-                  )}
+                  {type === "original" && isSold && <span className="ml-1 text-[9px]">✕</span>}
                 </button>
               );
             })}
           </div>
 
-          {/* Note line */}
+          {/* Note */}
           <p className="text-[10px] tracking-[0.12em]" style={{ color: "rgba(0,0,0,0.35)" }}>
             {selected === "original" ? t("product.originalNote") : t("product.printNote")}
           </p>
@@ -220,7 +215,7 @@ function ProductCard({
               </p>
             </div>
 
-            {!(selected === "original" && isOriginalSold) && (
+            {!(selected === "original" && isSold) && (
               <button
                 onClick={handleCartToggle}
                 className="flex items-center gap-2 px-5 py-3 text-xs tracking-[0.15em] uppercase transition-all duration-300 active:scale-95 rounded-sm"
@@ -239,30 +234,35 @@ function ProductCard({
       </article>
 
       {zoomed && (
-        <ZoomModal
-          src={painting.src}
-          title={painting.title}
-          onClose={() => setZoomed(false)}
-        />
+        <ZoomModal src={painting.src} title={painting.title} onClose={() => setZoomed(false)} />
       )}
     </>
   );
 }
 
+/* ── Grid ── */
 export default function ProductGrid() {
   const { t } = useLang();
   const [paintings, setPaintings] = useState<Painting[]>([]);
-  const [soldIds, setSoldIds]     = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    fetch("/api/paintings")
+  const loadPaintings = () => {
+    // cache-buster + no-store so admin changes show immediately
+    fetch(`/api/paintings?t=${Date.now()}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((data: Painting[]) => setPaintings(data))
       .catch(() => {});
-    fetch("/api/paintings/sold")
-      .then((r) => r.json())
-      .then((data: { soldIds: number[] }) => setSoldIds(new Set(data.soldIds)))
-      .catch(() => {});
+  };
+
+  useEffect(() => {
+    loadPaintings();
+    // Refresh whenever the tab regains focus — picks up admin changes instantly
+    const onFocus = () => loadPaintings();
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
   }, []);
 
   return (
@@ -292,7 +292,7 @@ export default function ProductGrid() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {paintings.map((painting) => (
-            <ProductCard key={painting.id} painting={painting} soldIds={soldIds} />
+            <ProductCard key={painting.id} painting={painting} />
           ))}
         </div>
       </div>
