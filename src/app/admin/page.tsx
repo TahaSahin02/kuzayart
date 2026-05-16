@@ -334,15 +334,44 @@ function CollectionTab() {
                 <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>Baskı €{p.print_price}</span>
               </div>
 
-              {/* Toggles */}
-              <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
-                <button onClick={() => toggleField(p, "is_sold")}
-                  style={{ flex: 1, padding: "6px 8px", fontSize: "10px", letterSpacing: "0.1em", cursor: "pointer", border: "1px solid", borderColor: p.is_sold ? "#f87171" : "rgba(255,255,255,0.15)", background: p.is_sold ? "rgba(248,113,113,0.12)" : "transparent", color: p.is_sold ? "#f87171" : "rgba(255,255,255,0.4)" }}>
-                  {p.is_sold ? "✓ SATILDI" : "SATILDI"}
-                </button>
+              {/* Satış durumu — iki seçenek */}
+              <div style={{ marginBottom: "10px" }}>
+                <p style={{ fontSize: "10px", letterSpacing: "0.12em", color: "rgba(255,255,255,0.3)", marginBottom: "6px" }}>SATIŞ DURUMU</p>
+                <div style={{ display: "flex", gap: "0" }}>
+                  <button
+                    onClick={() => { if (p.is_sold) toggleField(p, "is_sold"); }}
+                    style={{
+                      flex: 1, padding: "8px 6px", fontSize: "11px", letterSpacing: "0.1em", cursor: "pointer",
+                      border: "1px solid", borderRight: "none",
+                      borderColor: !p.is_sold ? "#4ade80" : "rgba(255,255,255,0.12)",
+                      background: !p.is_sold ? "rgba(74,222,128,0.15)" : "transparent",
+                      color: !p.is_sold ? "#4ade80" : "rgba(255,255,255,0.35)",
+                      fontWeight: !p.is_sold ? 600 : 400,
+                    }}
+                  >
+                    {!p.is_sold ? "✓ SATIŞTA" : "SATIŞTA"}
+                  </button>
+                  <button
+                    style={{
+                      flex: 1, padding: "8px 6px", fontSize: "11px", letterSpacing: "0.1em", cursor: "pointer",
+                      border: "1px solid",
+                      borderColor: p.is_sold ? "#f87171" : "rgba(255,255,255,0.12)",
+                      background: p.is_sold ? "rgba(248,113,113,0.15)" : "transparent",
+                      color: p.is_sold ? "#f87171" : "rgba(255,255,255,0.35)",
+                      fontWeight: p.is_sold ? 600 : 400,
+                    }}
+                    onClick={() => { if (!p.is_sold) toggleField(p, "is_sold"); }}
+                  >
+                    {p.is_sold ? "✓ SATILDI" : "SATILDI"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Hero toggle */}
+              <div style={{ marginBottom: "12px" }}>
                 <button onClick={() => toggleField(p, "show_in_hero")}
-                  style={{ flex: 1, padding: "6px 8px", fontSize: "10px", letterSpacing: "0.1em", cursor: "pointer", border: "1px solid", borderColor: p.show_in_hero ? "#c9a96e" : "rgba(255,255,255,0.15)", background: p.show_in_hero ? "rgba(201,169,110,0.12)" : "transparent", color: p.show_in_hero ? "#c9a96e" : "rgba(255,255,255,0.4)" }}>
-                  {p.show_in_hero ? "✓ HERO" : "HERO"}
+                  style={{ width: "100%", padding: "7px 8px", fontSize: "10px", letterSpacing: "0.1em", cursor: "pointer", border: "1px solid", borderColor: p.show_in_hero ? "#c9a96e" : "rgba(255,255,255,0.12)", background: p.show_in_hero ? "rgba(201,169,110,0.12)" : "transparent", color: p.show_in_hero ? "#c9a96e" : "rgba(255,255,255,0.35)" }}>
+                  {p.show_in_hero ? "✓ HERO'DA GÖSTERİLİYOR" : "HERO'DA GÖSTER"}
                 </button>
               </div>
 
